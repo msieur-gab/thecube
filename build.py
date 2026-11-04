@@ -1,6 +1,6 @@
-"""Build the site: inline the fonts into src/index.html and write site/index.html.
+"""Build the site: inline the fonts into src/index.html and write index.html.
 
-    python3 build.py              -> site/index.html
+    python3 build.py              -> index.html
     python3 build.py --preview    -> also writes preview.html (page body only, for quick previews)
 """
 import base64, pathlib, sys
@@ -39,6 +39,5 @@ extra = f'''<meta charset="utf-8">
 <meta property="og:type" content="website">
 '''
 out = f'<!doctype html>\n<html lang="en">\n<head>\n{extra}{head}</head>\n<body>{body}</body>\n</html>\n'
-(ROOT / "site").mkdir(exist_ok=True)
-(ROOT / "site" / "index.html").write_text(out)
-print(f"site/index.html  {len(out) // 1024} KB")
+(ROOT / "index.html").write_text(out)
+print(f"index.html  {len(out) // 1024} KB")
