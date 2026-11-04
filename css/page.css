@@ -1,7 +1,7 @@
 /* schedule: what I'm busy with and where to hear me, side by side */
 .sched{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;align-items:stretch}
 .sched .talk{display:flex;flex-direction:column}
-.sched .talk .thesis,.sched .talk .note{margin-top:auto}
+.sched .talk .note{margin-top:auto}
 .sched .talk h3{text-wrap:balance}
 .talk .note{margin:18px 0 0;padding-top:18px;border-top:1px solid var(--line);font-size:15px;line-height:1.5;color:var(--ink-2)}
 .sched .talk .meta{margin-bottom:18px}
