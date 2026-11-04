@@ -135,6 +135,10 @@ def favicon(yaw=math.radians(45), mw=100):
             f"<style>{style}</style>" + "".join(parts) + "</svg>\n")
 
 
+PNG_COLOURWAYS = ["black"]   # add "white" or "yellow-black" here for PNGs of those too
+PNG_PX = 1024
+
+
 if __name__ == "__main__":
     (ROOT / "favicon.svg").write_text(favicon())
     (OUT / "svg").mkdir(parents=True, exist_ok=True)
@@ -143,4 +147,11 @@ if __name__ == "__main__":
         for deg in range(0, 180, 15):
             (OUT / "svg" / f"cube-{name}-{deg:03d}.svg").write_text(svg(math.radians(deg), solid, hatch, inside))
         gif(OUT / "gif" / f"cube-{name}-turn.gif", solid, hatch, inside, bg)
-    print("svg:", len(list((OUT / "svg").glob("*.svg"))), "gif:", sorted(p.name for p in (OUT / "gif").glob("*.gif")))
+    # PNG stills (transparent, soft edges and see-through inside kept): the black logo, same angles as the SVGs
+    (OUT / "png").mkdir(parents=True, exist_ok=True)
+    for name in PNG_COLOURWAYS:
+        solid, hatch, inside, _ = COLOURWAYS[name]
+        for deg in range(0, 180, 15):
+            frame(math.radians(deg), solid, hatch, inside, px=PNG_PX).save(OUT / "png" / f"cube-{name}-{deg:03d}.png", optimize=True)
+    print("svg:", len(list((OUT / "svg").glob("*.svg"))), "gif:", sorted(p.name for p in (OUT / "gif").glob("*.gif")),
+          "png:", len(list((OUT / "png").glob("*.png"))))
