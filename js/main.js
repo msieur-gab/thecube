@@ -9,9 +9,10 @@ import { initEvidence } from "./components/evidence.js";
 import { initDottedGround } from "./components/dotted-ground.js";
 import { initOneCard } from "./components/one-card.js";
 import { initBar } from "./components/bar.js";
+import { initBaseline } from "./components/baseline.js";
 // import { initMethodField } from "./components/method-field.js"; /* method section hidden in index.html until it is final */
 
 /* one part failing never stops the others */
-for (const init of [initNow, initOffer, initCubeMark, initField, initOneCard, initFooter, initTypedWord, initEvidence, initDottedGround, initBar /*, initMethodField */]) {
+for (const init of [initNow, initOffer, initBaseline, initCubeMark, initField, initOneCard, initFooter, initTypedWord, initEvidence, initDottedGround, initBar /*, initMethodField */]) {
   try { init(); } catch (err) { console.error("[the cube] " + init.name + " failed:", err); }
 }

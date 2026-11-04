@@ -12,7 +12,7 @@
   --closed:#DEDEDC;
   --flash:#B8B8B5; /* a tile starts its reveal here, so the wave reads */
   --hover:#E6E6E4;
-  --pip:#9A9A97; /* every dot on the page: the field, the dotted ground, the counts on revealed tiles */
+  --pip:#9A9A97; /* the dots of the field, the dotted ground and the evidence tiles */
   --mono:"DM Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
   --display:"Schibsted Grotesk","Helvetica Neue",Arial,sans-serif;
   --voice:"Departure Mono",ui-monospace,monospace; /* a pixel font: crisp only at multiples of 11 px (--voice-size) */
