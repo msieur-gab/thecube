@@ -7,7 +7,7 @@
 .sched .talk .meta{margin-bottom:18px}
 /* the dotted ground of the minefield carries on under every section */
 .dotted{position:relative;isolation:isolate;overflow-x:clip}
-.dots-bg{position:absolute;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);z-index:-1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58'%3E%3Crect x='28' y='28' width='2' height='2' fill='%23A8A8A5'/%3E%3C/svg%3E");background-repeat:repeat;background-position:center top}
+.dots-bg{position:absolute;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);z-index:-1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58'%3E%3Crect x='28' y='28' width='2' height='2' fill='%239A9A97'/%3E%3C/svg%3E");background-repeat:repeat;background-position:center top}
 .what-field i::before{opacity:0}
 .reveal{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58'%3E%3Crect x='28' y='28' width='2' height='2' fill='%23434548'/%3E%3C/svg%3E");background-repeat:repeat;background-position:center top}
 .wrap .label{font-weight:400}

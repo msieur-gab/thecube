@@ -6,15 +6,13 @@
   --ink:#141414;
   --ink-2:#55575A;
   --line:#C4C4C1;
-  --dot:#B4B4B1;
   --accent:#E4FE00;
   --accent-soft:color-mix(in srgb,var(--accent) 60%,#FFFFFF);
   --mine:#DEDEDC;
   --closed:#DEDEDC;
   --flash:#B8B8B5; /* a tile starts its reveal here, so the wave reads */
   --hover:#E6E6E4;
-  --pip:#A8A8A5;
-  --pip-dark:#B4B4B1;
+  --pip:#9A9A97; /* every dot on the page: the field, the dotted ground, the counts on revealed tiles */
   --mono:"DM Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
   --display:"Schibsted Grotesk","Helvetica Neue",Arial,sans-serif;
   --voice:"Departure Mono",ui-monospace,monospace; /* a pixel font: crisp only at multiples of 11 px (--voice-size) */

@@ -28,7 +28,7 @@
 .ev-card{flex:0 0 var(--card,min(640px,88%));scroll-snap-align:start;display:grid;grid-template-columns:minmax(88px,min(200px,34%)) minmax(0,1fr);gap:clamp(16px,3vw,32px);align-items:center;padding:clamp(16px,2.4vw,24px);background:var(--surface);border-radius:14px;min-width:0}
 .tiles{display:grid;grid-template-columns:repeat(10,1fr);gap:2px}
 .tiles i{position:relative;aspect-ratio:1}
-.tiles i::before{content:"";position:absolute;left:50%;top:50%;width:2px;height:2px;margin:-1px 0 0 -1px;background:var(--pip-dark)}
+.tiles i::before{content:"";position:absolute;left:50%;top:50%;width:2px;height:2px;margin:-1px 0 0 -1px;background:var(--pip)}
 .tiles i.half::before{width:56%;height:28%;margin:0;left:22%;top:50%;background:var(--accent);animation:pop .22s var(--d,0ms) cubic-bezier(.2,.8,.3,1.4) both}
 .tiles i.lit::before{width:56%;height:56%;margin:0;left:22%;top:22%;background:var(--accent);animation:pop .22s var(--d,0ms) cubic-bezier(.2,.8,.3,1.4) both}
 @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
@@ -52,7 +52,7 @@
 #what>.q,#what>.a{position:relative;z-index:1}
 .what-field{position:absolute;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);z-index:0;display:grid;grid-auto-rows:var(--size);align-content:start;justify-content:center;overflow:hidden;pointer-events:none}
 .what-field i{position:relative;width:var(--size);height:var(--size);transition:background-color .45s ease}
-.what-field i::before{content:"";position:absolute;left:50%;top:50%;width:2px;height:2px;margin:-1px 0 0 -1px;background:#A8A8A5;transition:opacity .3s}
+.what-field i::before{content:"";position:absolute;left:50%;top:50%;width:2px;height:2px;margin:-1px 0 0 -1px;background:var(--pip);transition:opacity .3s}
 .what-field i.open{background:var(--surface);animation:tileOpen .3s var(--d,0ms) ease-out both}
 .what-field i.open::before{opacity:0}
 .what-field i.mine::after{content:"";position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;background:var(--accent);animation:fadeIn .3s calc(var(--d,0ms) + 120ms) ease-out both}

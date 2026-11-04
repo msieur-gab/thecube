@@ -2,10 +2,11 @@
 /* one grid for the whole page: the method's tiles use the same columns (48 px squares on phones, 58 px elsewhere) */
 export function initDottedGround() {
   const host = document.getElementById("dotted"), dots = document.getElementById("dots-bg");
+  const pip = (getComputedStyle(document.documentElement).getPropertyValue("--pip").trim() || "#9A9A97").replace("#", "%23");
   const draw = () => {
     const W = dots.clientWidth, size = W < 600 ? 48 : 58, cols = Math.ceil(W / size);
     const left0 = (W - cols * size) / 2, c = size / 2 - 1;
-    dots.style.backgroundImage = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='" + size + "' height='" + size + "'%3E%3Crect x='" + c + "' y='" + c + "' width='2' height='2' fill='%23A8A8A5'/%3E%3C/svg%3E\")";
+    dots.style.backgroundImage = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='" + size + "' height='" + size + "'%3E%3Crect x='" + c + "' y='" + c + "' width='2' height='2' fill='" + pip + "'/%3E%3C/svg%3E\")";
     dots.style.backgroundPosition = left0 + "px 0px";
   };
   draw();
