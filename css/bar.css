@@ -1,15 +1,18 @@
-/* sticky bar: once the hero's buttons scroll away, the logo and the two buttons dock at the top */
-:root{--bar-h:56px}
-html{scroll-padding-top:var(--bar-h)} /* snapping and anchors land below the bar, not under it */
-.bar{position:fixed;z-index:30;top:0;left:0;right:0;height:var(--bar-h);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 var(--gutter-r) 0 var(--gutter-l);background:color-mix(in srgb,var(--paper) 90%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 1px 0 color-mix(in srgb,var(--ink) 10%,transparent);transform:translateY(-100%);opacity:0;transition:transform .35s ease,opacity .35s ease}
+/* floating pills: once the hero's buttons scroll away, they follow down the page with the same shape and shadow;
+   on desktop the logo comes along in a pill of its own, on phones only the two buttons */
+:root{--bar-h:64px}
+html{scroll-padding-top:var(--bar-h)} /* snapping and anchors land below the pills, not under them */
+.bar{position:fixed;z-index:30;top:12px;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 var(--gutter-r) 0 var(--gutter-l);pointer-events:none;transform:translateY(calc(-100% - 16px));opacity:0;transition:transform .35s ease,opacity .35s ease}
 .bar.on{transform:none;opacity:1}
-.bar-brand{display:flex;align-items:center;gap:10px;min-width:0;color:var(--ink);text-decoration:none;font-size:1.35rem;font-weight:600;line-height:1;letter-spacing:-.045em;white-space:nowrap}
-.bar-mark-box{flex:none;display:block;width:28px;height:28px}
+.bar-brand,.bar-actions{pointer-events:auto}
+.bar-brand{display:flex;align-items:center;gap:8px;padding:6px 16px 6px 8px;border-radius:999px;background:var(--paper);color:var(--ink);text-decoration:none;font-size:1.15rem;font-weight:600;line-height:1;letter-spacing:-.045em;white-space:nowrap;box-shadow:0 8px 20px rgba(20,20,20,.2)}
+.bar-mark-box{flex:none;display:block;width:24px;height:24px}
 .bar-mark-box canvas{display:block;width:100%;height:100%}
-.bar-actions{display:flex;gap:8px}
-.bar .float{padding:8px 14px;font-size:11px;box-shadow:none;white-space:nowrap}
-@media (max-width:479px){
-  .bar-name{display:none}
-  .bar .float{padding:8px 11px}
+.bar-actions{display:flex;gap:10px}
+.bar .float{white-space:nowrap}
+@media (max-width:599px){
+  .bar-brand{display:none}
+  .bar-actions{flex:1}
+  .bar .float{flex:1 1 auto;justify-content:center}
 }
 @media (prefers-reduced-motion:reduce){.bar{transition:none}}
