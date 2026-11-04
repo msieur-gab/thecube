@@ -1,0 +1,55 @@
+/* ---- logo: one cube, one solid face, one hatched face ---- */
+export function initCubeMark() {
+  const mk = document.getElementById("mark"), mc = mk.getContext("2d");
+  const css = getComputedStyle(document.documentElement);
+  const ink = css.getPropertyValue("--ink").trim() || "#141414";
+  const acc = css.getPropertyValue("--accent").trim() || "#E4FE00";
+  const D = 2.6;
+  let mw = 0, yaw = 0;
+  const box = document.getElementById("mark-box"), text = document.getElementById("title-text");
+  const size = () => {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const h = Math.round(text.querySelector(".lockup").getBoundingClientRect().height);
+    box.style.width = box.style.height = h + "px";
+    mw = h;
+    mk.width = mk.height = Math.round(mw * dpr);
+    mc.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+  const lp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+  const draw = () => {
+    mc.clearRect(0, 0, mw, mw);
+    const cx = mw / 2, cy = mw / 2, S = mw * .5, lw = Math.max(1, mw / 34);
+    const pt = (a, y) => {
+      const x = Math.SQRT1_2 * Math.sin(a), z = Math.SQRT1_2 * Math.cos(a), f = D / (D - z);
+      return [cx + x * f * S, cy - y * f * S];
+    };
+    const fs = [];
+    for (let fi = 0; fi < 4; fi++) {
+      const th = yaw + fi * Math.PI / 2, nx = Math.sin(th), nz = Math.cos(th);
+      if (nx * -.5 * nx + nz * (D - .5 * nz) <= 0) continue;
+      fs.push({ solid: fi % 2 === 0, z: nz, B0: pt(th - Math.PI / 4, -.5), B1: pt(th + Math.PI / 4, -.5), T1: pt(th + Math.PI / 4, .5), T0: pt(th - Math.PI / 4, .5) });
+    }
+    fs.sort((a, b) => a.z - b.z);
+    mc.lineCap = "round"; mc.lineJoin = "round"; mc.strokeStyle = ink;
+    for (const f of fs) {
+      if (f.solid) {
+        mc.beginPath(); mc.moveTo(...f.B0); mc.lineTo(...f.B1); mc.lineTo(...f.T1); mc.lineTo(...f.T0); mc.closePath();
+        mc.fillStyle = acc; mc.fill();
+      } else {
+        mc.lineWidth = Math.max(1, mw / 70); mc.lineCap = "butt"; mc.beginPath();
+        const G = mw > 64 ? 6 : 4, d = mw > 64 ? .055 : .085;
+        for (let i = 0; i < G; i++) for (let j = 0; j < G; j++) {
+          const u = (i + .5) / G, v = (j + .5) / G;
+          const at = (uu, vv) => lp(lp(f.B0, f.B1, uu), lp(f.T0, f.T1, uu), vv);
+          mc.moveTo(...at(u - d, v - d)); mc.lineTo(...at(u + d, v + d));
+        }
+        mc.stroke();
+      }
+    }
+  };
+  /* a different angle on each visit: one of the steps of a quarter turn (never fully front-on) */
+  yaw = (1 + Math.floor(Math.random() * 15)) / 16 * Math.PI / 2;
+  size(); draw();
+  window.addEventListener("resize", () => { size(); draw(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { size(); draw(); });
+}

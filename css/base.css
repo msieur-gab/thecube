@@ -1,0 +1,35 @@
+/* Layout: the hero is a field of squares; clicking one unfolds a patch and lands on a perspective card.
+   Below, question-left / answer-right rows. Single light look by choice: grey paper, one lime accent. */
+:root{
+  --paper:#DEDEDC;
+  --surface:#ECECEA;
+  --ink:#141414;
+  --ink-2:#55575A;
+  --line:#C4C4C1;
+  --dot:#B4B4B1;
+  --accent:#E4FE00;
+  --accent-soft:color-mix(in srgb,var(--accent) 60%,#FFFFFF);
+  --mine:#DEDEDC;
+  --closed:#DEDEDC;
+  --flash:#B8B8B5; /* a tile starts its reveal here, so the wave reads */
+  --hover:#E6E6E4;
+  --pip:#A8A8A5;
+  --pip-dark:#B4B4B1;
+  --mono:"DM Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --display:"Schibsted Grotesk","Helvetica Neue",Arial,sans-serif;
+  --voice:"Newsreader",Georgia,"Times New Roman",serif;
+  --gutter-l:max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r:max(16px, env(safe-area-inset-right, 0px));
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--display);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:2px}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ---------- sheet ---------- */
+.sheet{background:var(--paper);overflow:hidden;transition:background-color .9s ease}
+.sheet.unfolded{background:var(--surface)}
