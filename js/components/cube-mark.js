@@ -1,18 +1,29 @@
 import { reduce } from "../utils/motion.js";
 
 /* ---- logo: one cube, one solid face, one hatched face ---- */
+/* the same cube twice: large in the hero, small in the sticky bar; both start at the same angle */
 export function initCubeMark() {
-  const mk = document.getElementById("mark"), mc = mk.getContext("2d");
+  /* a different angle on each visit: any quarter of the full turn, one of its steps (never fully front-on) */
+  const yaw0 = (Math.floor(Math.random() * 4) * 16 + 1 + Math.floor(Math.random() * 15)) / 16 * Math.PI / 2;
+  const text = document.getElementById("title-text");
+  mountCube(document.getElementById("mark"), document.getElementById("mark-box"),
+    () => Math.round(text.querySelector(".lockup").getBoundingClientRect().height), document.querySelector(".title"), yaw0);
+  const barBox = document.getElementById("bar-mark-box");
+  if (barBox) mountCube(document.getElementById("bar-mark"), barBox, () => barBox.clientHeight, document.querySelector(".bar-brand"), yaw0);
+}
+
+function mountCube(mk, box, height, hoverEl, startYaw) {
+  const mc = mk.getContext("2d");
   const css = getComputedStyle(document.documentElement);
   const ink = css.getPropertyValue("--ink").trim() || "#141414";
   const acc = css.getPropertyValue("--accent").trim() || "#E4FE00";
   const D = 2.6;
   const INSIDE = .14; /* how dark the inside of the cube shows through the hatching */
-  let mw = 0, yaw = 0;
-  const box = document.getElementById("mark-box"), text = document.getElementById("title-text");
+  let mw = 0, yaw = startYaw;
   const size = () => {
     const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const h = Math.round(text.querySelector(".lockup").getBoundingClientRect().height);
+    const h = height();
+    if (!h) return;
     box.style.width = box.style.height = h + "px";
     mw = h;
     mk.width = mk.height = Math.round(mw * dpr);
@@ -21,7 +32,7 @@ export function initCubeMark() {
   const lp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
   const draw = () => {
     mc.clearRect(0, 0, mw, mw);
-    const cx = mw / 2, cy = mw / 2, S = mw * .5, lw = Math.max(1, mw / 34);
+    const cx = mw / 2, cy = mw / 2, S = mw * .5;
     const pt = (a, y) => {
       const x = Math.SQRT1_2 * Math.sin(a), z = Math.SQRT1_2 * Math.cos(a), f = D / (D - z);
       return [cx + x * f * S, cy - y * f * S];
@@ -54,15 +65,12 @@ export function initCubeMark() {
       }
     }
   };
-  /* a different angle on each visit: any quarter of the full turn, one of its steps (never fully front-on) */
-  yaw = (Math.floor(Math.random() * 4) * 16 + 1 + Math.floor(Math.random() * 15)) / 16 * Math.PI / 2;
   size(); draw();
   window.addEventListener("resize", () => { size(); draw(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { size(); draw(); });
 
   /* pointing at the logo (cube or name) spins it; leaving lets it slow down and rest where it is */
-  const title = box.closest(".title");
-  if (!title || reduce) return;
+  if (!hoverEl || reduce) return;
   const SPIN = Math.PI * 2 / 3; /* full speed: one turn every 3 s */
   let speed = 0, target = 0, last = 0, raf = 0;
   const step = t => {
@@ -72,6 +80,6 @@ export function initCubeMark() {
     if (target || speed > .02) raf = requestAnimationFrame(step);
     else { raf = 0; last = 0; speed = 0; }
   };
-  title.addEventListener("pointerenter", () => { target = SPIN; if (!raf) raf = requestAnimationFrame(step); });
-  title.addEventListener("pointerleave", () => { target = 0; });
+  hoverEl.addEventListener("pointerenter", () => { target = SPIN; if (!raf) raf = requestAnimationFrame(step); });
+  hoverEl.addEventListener("pointerleave", () => { target = 0; });
 }
