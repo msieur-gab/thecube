@@ -17,7 +17,8 @@
   --pip-dark:#B4B4B1;
   --mono:"DM Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
   --display:"Schibsted Grotesk","Helvetica Neue",Arial,sans-serif;
-  --voice:"Newsreader",Georgia,"Times New Roman",serif;
+  --voice:"Departure Mono",ui-monospace,monospace; /* a pixel font: crisp only at multiples of 11 px (--voice-size) */
+  --voice-size:22px;
   --gutter-l:max(16px, env(safe-area-inset-left, 0px));
   --gutter-r:max(16px, env(safe-area-inset-right, 0px));
   color-scheme:light;
