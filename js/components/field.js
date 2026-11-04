@@ -90,7 +90,7 @@ export function initField() {
       offerCard.classList.add("covered");
       return;
     }
-    card.style.width = "";
+    card.style.width = offerCard.offsetWidth + "px"; /* one card size, as on phones */
     offerCard.classList.remove("covered");
     const r = els[idx].getBoundingClientRect();
     const W = hero.clientWidth, H = hero.clientHeight, cw = card.offsetWidth, ch = card.offsetHeight;
