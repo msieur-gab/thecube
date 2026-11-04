@@ -24,6 +24,7 @@
   --flash:#B8B8B5; /* a tile starts its reveal here, so the wave reads */
   --hover:#E6E6E4;
   --pip:#A8A8A5;
+  --pip-dark:#B4B4B1;
   --mono:"DM Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
   --display:"Schibsted Grotesk","Helvetica Neue",Arial,sans-serif;
   --voice:"Newsreader",Georgia,"Times New Roman",serif;
@@ -66,12 +67,13 @@ a{color:inherit}
 
 /* perspective card, with a folded corner */
 .card{position:absolute;z-index:5;width:min(320px,calc(100% - 24px));filter:drop-shadow(0 12px 22px rgba(20,20,20,.24))}
-.card-in{position:relative;background:var(--accent-soft);padding:22px 22px 18px;clip-path:polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,0 100%)}
+.card-in{position:relative;background:var(--accent-soft);border-radius:7px;padding:22px 22px 18px;clip-path:polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,0 100%)}
 .card-in::after{content:"";position:absolute;top:0;right:0;width:24px;height:24px;background:linear-gradient(to bottom left,transparent 50%,color-mix(in srgb,var(--accent-soft) 80%,var(--ink)) 50%)}
 .card h2{margin:0 0 8px;padding-right:18px;font-size:1.25rem;font-weight:600;line-height:1.15;letter-spacing:-.02em;text-wrap:balance}
 .card p{margin:0;font-size:15px;line-height:1.45}
 .card-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-variant-numeric:tabular-nums}
-.card button{appearance:none;border:0;background:var(--ink);color:var(--accent);font:inherit;padding:6px 10px;cursor:pointer}
+.card button{appearance:none;border:0;background:var(--ink);color:var(--accent);font:inherit;text-transform:uppercase;letter-spacing:.05em;padding:7px 14px;border-radius:999px;cursor:pointer}
+.card button:hover{background:var(--ink-2)}
 .card button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .card.pop{animation:grow .2s ease-out forwards}
 @keyframes grow{0%{transform:scale(0);opacity:0}70%{transform:scale(1.1);opacity:.9}100%{transform:scale(1);opacity:1}}
@@ -102,7 +104,7 @@ a{color:inherit}
 .offer-head{display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase}
 .offer-dots{display:flex}
 .offer-dots button{position:relative;width:14px;height:14px;padding:0;border:0;background:transparent;cursor:pointer}
-.offer-dots button::before{content:"";position:absolute;inset:3px;border:1px solid var(--ink);border-radius:2px}
+.offer-dots button::before{content:"";position:absolute;inset:3px;border:1px solid var(--ink);border-radius:3px}
 .offer-dots button[aria-current="true"]::before{background:var(--ink)}
 .offer-track{display:flex;width:100%;min-width:0;margin-top:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;border-radius:2px}
 .offer-track::-webkit-scrollbar{display:none}
@@ -116,13 +118,14 @@ a{color:inherit}
 
 /* ---------- now ---------- */
 .now{padding-left:var(--gutter-l);padding-right:var(--gutter-r);padding-block:clamp(56px,9vw,128px) clamp(48px,7vw,96px)}
-.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:20px clamp(24px,5vw,72px);padding-block:clamp(32px,5vw,56px);border-top:1px solid var(--line)}
-.row:first-child{border-top:1px solid var(--ink)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:20px clamp(24px,5vw,72px);padding-block:clamp(32px,5vw,56px)}
+
 .q{margin:0;font-family:var(--voice);font-style:italic;font-size:clamp(1.3rem,2.2vw,1.6rem);line-height:1.2;color:var(--ink-2)}
-.a{min-width:0;max-width:44rem}
+.a{min-width:0}
+:where(.now) .a{max-width:44rem}
 .statement{margin:0;font-size:clamp(1.75rem,3.8vw,2.8rem);font-weight:500;line-height:1.08;letter-spacing:-.03em;text-wrap:balance}
-.a p{margin:16px 0 0;font-size:1.0625rem;color:var(--ink-2);max-width:36rem}
-.a p.lede{color:var(--ink);font-size:1.1875rem}
+:where(.now) .a p{margin:16px 0 0;font-size:1.0625rem;color:var(--ink-2);max-width:36rem}
+:where(.now) .a p.lede{color:var(--ink);font-size:1.1875rem}
 .status{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:24px;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
 .status .sep{width:1px;height:14px;background:var(--line)}
 .status .muted{color:var(--ink-2);font-weight:400}
@@ -150,15 +153,6 @@ a{color:inherit}
 .also{margin-top:18px!important;font-size:15px!important}
 .also a{color:var(--ink);text-underline-offset:.2em}
 
-footer{padding-left:var(--gutter-l);padding-right:var(--gutter-r);padding-block:24px 40px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}
-.foot-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px}
-.legal summary{cursor:pointer;color:var(--ink);list-style:none}
-.legal summary::-webkit-details-marker{display:none}
-.legal summary::after{content:" +"}
-.legal[open] summary::after{content:" −"}
-.legal-body{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px 40px;margin-top:18px;max-width:52rem}
-.legal-body p{margin:0}
-.legal-body strong{color:var(--ink);font-weight:500}
 
 /* ---------- narrow ---------- */
 @media (max-width:819px){
@@ -177,10 +171,179 @@ footer{padding-left:var(--gutter-l);padding-right:var(--gutter-r);padding-block:
   .cell .num{opacity:1}
   .dot::after{animation:none;opacity:0}
 }
+
+/* ================= sections: why, what, who, footer ================= */
+.wrap{padding-left:var(--gutter-l);padding-right:var(--gutter-r)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:20px clamp(24px,5vw,72px);padding-block:clamp(40px,6vw,80px)}
+.q{margin:0;font-family:var(--voice);font-style:italic;font-size:clamp(1.3rem,2.2vw,1.6rem);line-height:1.2;color:var(--ink-2)}
+.a{min-width:0}
+.swap{display:inline-block;perspective:600px;vertical-align:baseline}
+.swap-w{display:inline-block;padding:0 .14em;margin:0 -.02em;background:var(--accent);color:var(--ink);border-radius:2px;transform-origin:50% 100%}
+.swap-w{min-width:.6em;min-height:1em;vertical-align:bottom}
+.swap-w.typing::after{content:"";display:inline-block;width:.06em;height:.9em;margin-left:.04em;vertical-align:-.08em;background:var(--ink);animation:caret 1s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+.statement{margin:0;max-width:40rem;font-size:clamp(1.75rem,3.8vw,2.8rem);font-weight:500;line-height:1.08;letter-spacing:-.03em;text-wrap:balance}
+.lede{margin:16px 0 0;max-width:36rem;font-size:1.1875rem;color:var(--ink)}
+.body{margin:14px 0 0;max-width:36rem;font-size:1.0625rem;color:var(--ink-2)}
+.label{margin:0 0 14px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+
+/* ---------- why: a carousel of evidence ---------- */
+.evidence{margin-top:40px;min-width:0}
+.ev-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:14px}
+.ev-head .label{margin:0}
+.ev-marks{display:flex}
+.ev-marks button{position:relative;width:14px;height:14px;padding:0;border:0;background:transparent;cursor:pointer}
+.ev-marks button::before{content:"";position:absolute;inset:3px;border:1px solid var(--ink);border-radius:3px}
+.ev-marks button[aria-current="true"]::before{background:var(--ink)}
+/* full-bleed track: cards start at the column, run to the right edge and exit at the left edge of the screen */
+.ev-track{display:flex;gap:16px;width:var(--vw,100%);min-width:0;margin-left:calc(-1 * var(--bleed,0px));padding-left:var(--bleed,0px);padding-right:max(var(--bleed,0px), calc(var(--vw,100%) - var(--bleed,0px) - var(--card,0px)));scroll-padding-left:var(--bleed,0px);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;padding-bottom:6px}
+.ev-track::-webkit-scrollbar{display:none}
+.ev-track:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+.ev-card{flex:0 0 var(--card,min(640px,88%));scroll-snap-align:start;display:grid;grid-template-columns:minmax(88px,min(200px,34%)) minmax(0,1fr);gap:clamp(16px,3vw,32px);align-items:center;padding:clamp(16px,2.4vw,24px);background:var(--surface);border-radius:14px;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(10,1fr);gap:2px}
+.tiles i{position:relative;aspect-ratio:1}
+.tiles i::before{content:"";position:absolute;left:50%;top:50%;width:2px;height:2px;margin:-1px 0 0 -1px;background:var(--pip-dark)}
+.tiles i.half::before{width:56%;height:28%;margin:0;left:22%;top:50%;background:var(--accent);animation:pop .22s var(--d,0ms) cubic-bezier(.2,.8,.3,1.4) both}
+.tiles i.lit::before{width:56%;height:56%;margin:0;left:22%;top:22%;background:var(--accent);animation:pop .22s var(--d,0ms) cubic-bezier(.2,.8,.3,1.4) both}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.ev-body{display:grid;gap:8px;min-width:0}
+.voice{margin:0;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.pct{margin:0;display:flex;align-items:flex-start;font-size:clamp(2.8rem,6vw,4.4rem);font-weight:600;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.num{display:inline-flex}
+.digit{display:inline-block;height:1em;overflow:hidden}
+.reel{display:flex;flex-direction:column;transition:transform 1.5s cubic-bezier(.12,.75,.2,1)}
+.reel span{display:block;height:1em;line-height:1}
+.sign{font-size:.5em;margin-top:.12em;margin-left:.06em}
+.dot-sep{display:inline-block;height:1em;line-height:1}
+.say{margin:0;font-size:15px;line-height:1.4;max-width:24rem}
+.src{margin:0;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2)}
+.ev-card.pending .tiles{opacity:.55}
+.ev-card.pending .pct{color:var(--ink-2)}
+
+/* ---------- what: hovering a step opens tiles in the section background ---------- */
+.wrap{overflow-x:clip}
+#what{position:relative;isolation:isolate}
+#what>.q,#what>.a{position:relative;z-index:1}
+.what-field{position:absolute;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);z-index:0;display:grid;grid-auto-rows:var(--size);align-content:start;justify-content:center;overflow:hidden;pointer-events:none}
+.what-field i{position:relative;width:var(--size);height:var(--size);transition:background-color .45s ease}
+.what-field i::before{content:"";position:absolute;left:50%;top:50%;width:2px;height:2px;margin:-1px 0 0 -1px;background:#A8A8A5;transition:opacity .3s}
+.what-field i.open{background:var(--surface);animation:tileOpen .3s var(--d,0ms) ease-out both}
+.what-field i.open::before{opacity:0}
+.what-field i.mine::after{content:"";position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;background:var(--accent);animation:fadeIn .3s calc(var(--d,0ms) + 120ms) ease-out both}
+@keyframes tileOpen{from{background:#B8B8B5}to{background:var(--surface)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.method{margin-top:40px}
+.steps{margin:0;padding:0;list-style:none;display:grid;gap:4px;min-width:0;max-width:44rem}
+.steps li{display:grid;grid-template-columns:2.2rem minmax(0,1fr);gap:4px 12px;padding:18px 12px 18px 0;border-top:1px solid var(--line);cursor:default}
+.steps li:first-child{border-top:0}
+.steps .n{font-family:var(--mono);font-size:12px;color:var(--ink-2);padding-top:3px}
+.steps h3{margin:0;font-size:1.125rem;font-weight:600;letter-spacing:-.015em;width:fit-content}
+.steps p{grid-column:2;margin:0;font-size:15px;color:var(--ink-2);max-width:32rem}
+.steps li.on h3{background-image:linear-gradient(var(--accent),var(--accent));background-repeat:no-repeat;background-position:0 88%;background-size:100% .45em}
+
+/* ---------- who ---------- */
+.track{margin:32px 0 0;padding:0;list-style:none;max-width:40rem;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+.track li{display:grid;grid-template-columns:7.5rem minmax(0,1fr);gap:4px 16px;padding:12px 0;border-top:1px solid var(--line)}
+.track .y{color:var(--ink-2);font-variant-numeric:tabular-nums}
+.track .r{color:var(--ink);text-transform:none;line-height:1.5}
+.track .r em{font-style:normal;color:var(--ink-2)}
+
+/* ---------- footer: sits behind the page and is revealed at the end of the scroll ---------- */
+.sheet{position:relative;z-index:1;box-shadow:0 24px 48px rgba(0,0,0,.32)}
+.footer-spacer{height:var(--fh,50svh);pointer-events:none}
+.reveal{position:fixed;left:0;right:0;bottom:0;z-index:0;min-height:50svh;display:flex;align-items:flex-end;background:#2E2F31;color:#E6E6E4;padding-left:var(--gutter-l);padding-right:var(--gutter-r);padding-block:clamp(40px,6vw,72px) 28px}
+.reveal.static{position:relative}
+.reveal-in{width:100%;max-width:1320px;margin-inline:auto;display:grid;gap:clamp(36px,6vw,64px)}
+.r-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:20px clamp(24px,5vw,72px)}
+.r-q{margin:0;font-family:var(--voice);font-style:italic;font-size:clamp(1.3rem,2.2vw,1.6rem);color:#A6A8AB}
+.r-statement{margin:0;font-size:clamp(1.9rem,4.2vw,3.2rem);font-weight:500;line-height:1.05;letter-spacing:-.03em;color:#F2F2F0}
+.r-lede{margin:14px 0 0;font-size:1.0625rem;color:#B9BBBE;max-width:34rem}
+.r-mail{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;margin-top:24px}
+.r-mail a{font-size:clamp(1.4rem,3vw,2.1rem);font-weight:500;letter-spacing:-.025em;color:#F2F2F0;text-decoration-line:underline;text-decoration-color:var(--accent);text-decoration-thickness:.12em;text-underline-offset:.16em;word-break:break-word}
+.r-btn{appearance:none;font:inherit;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:9px 14px;border:0;border-radius:999px;background:var(--accent);color:var(--ink);cursor:pointer}
+.r-also{margin:16px 0 0;font-size:15px;color:#B9BBBE}
+.r-also a{color:#F2F2F0;text-underline-offset:.2em}
+.r-base{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:14px clamp(24px,5vw,72px);padding-top:20px;border-top:1px solid #4A4C4F}
+.r-label{margin:clamp(28px,4vw,48px) 0 10px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8C8E92}
+.r-refs{margin:0;padding:0;list-style:none;display:grid;gap:10px;max-width:22rem}
+.r-refs li{display:grid;grid-template-columns:5.2rem minmax(0,1fr);gap:10px;font-size:13px;line-height:1.4}
+.r-fig{font-family:var(--mono);font-size:11px;color:#E6E6E4;padding-top:2px;font-variant-numeric:tabular-nums}
+.r-refs a{color:#C9CBCE;text-decoration:none;border-bottom:1px solid #5A5C60}
+.r-refs a:hover{color:#F2F2F0;border-bottom-color:var(--accent)}
+.r-base-a{display:grid;gap:14px;min-width:0}
+.reveal .sources{margin:0;padding:0;border:0;color:#9A9CA0;line-height:1.6}
+.reveal .sources strong{color:#E6E6E4}
+.reveal .sources a{color:#D0D2D4}
+.r-legal{margin:clamp(32px,5vw,56px) 0 0;padding-top:16px;border-top:1px solid #4A4C4F;display:flex;flex-wrap:wrap;justify-content:flex-start;gap:8px 24px;font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:#8C8E92}
+.r-imp-link{color:#B9BBBE;text-decoration:none;border-bottom:1px solid #5A5C60}
+.r-imp-link:hover{color:#F2F2F0;border-bottom-color:var(--accent)}
+/* legal text lives in a dialog: reachable only through the link, never by scrolling */
+.legal{width:min(46rem,calc(100% - 32px));max-height:min(86svh,900px);margin:auto;padding:0;border:0;border-radius:14px;background:var(--paper);color:var(--ink);box-shadow:0 24px 64px rgba(0,0,0,.35);overflow:hidden}
+.legal[open]{display:flex;flex-direction:column}
+.legal::backdrop{background:rgba(20,20,20,.55)}
+.legal-head{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px clamp(20px,4vw,32px);border-bottom:1px solid var(--line)}
+.legal-head h2{margin:0;font-size:1.25rem;font-weight:600;letter-spacing:-.02em}
+.legal-close{appearance:none;border:0;background:var(--ink);color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:7px 14px;border-radius:999px;cursor:pointer}
+.legal-close:hover{background:var(--ink-2)}
+.legal-close:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.legal-body{overflow-y:auto;overscroll-behavior:contain;padding:clamp(20px,4vw,32px);display:grid;grid-template-columns:minmax(0,1fr);gap:28px;font-size:14px;line-height:1.55;color:var(--ink-2)}
+.legal-body p{margin:0 0 10px;max-width:40rem}
+.legal-body h4{margin:0 0 12px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.legal-body strong{color:var(--ink);font-weight:500}
+html:has(.legal[open]){overflow:hidden}
+@media (min-width:820px){.legal-body{grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:clamp(28px,4vw,48px)}}
+.reveal :focus-visible{outline-color:var(--accent)}
+@media (max-width:819px){.r-row,.r-base{grid-template-columns:minmax(0,1fr)}}
+
+.sources{margin:0;padding-top:24px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--ink-2)}
+.sources strong{color:var(--ink);font-weight:500}
+.sources a{color:var(--ink);text-underline-offset:3px}
+
+@media (max-width:819px){
+  .row{grid-template-columns:minmax(0,1fr)}
+  .method{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:599px){
+  .ev-card{grid-template-columns:minmax(0,1fr);align-items:start;gap:18px}
+  .ev-body,.say{max-width:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .what-field i.open,.what-field i.mine::after{animation:none}
+  .reel{transition:none}
+  .tiles i.lit::before{animation:none}
+}
+
+/* schedule: what I'm busy with and where to hear me, side by side */
+.sched{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;align-items:stretch}
+.sched .talk{display:flex;flex-direction:column}
+.sched .talk .thesis,.sched .talk .note{margin-top:auto}
+.sched .talk h3{text-wrap:balance}
+.talk .note{margin:18px 0 0;padding-top:18px;border-top:1px solid var(--line);font-size:15px;line-height:1.5;color:var(--ink-2)}
+.sched .talk .meta{margin-bottom:18px}
+/* the dotted ground of the minefield carries on under every section */
+.dotted{position:relative;isolation:isolate;overflow-x:clip}
+.dots-bg{position:absolute;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);z-index:-1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58'%3E%3Crect x='28' y='28' width='2' height='2' fill='%23A8A8A5'/%3E%3C/svg%3E");background-repeat:repeat;background-position:center top}
+.what-field i::before{opacity:0}
+.reveal{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58'%3E%3Crect x='28' y='28' width='2' height='2' fill='%23434548'/%3E%3C/svg%3E");background-repeat:repeat;background-position:center top}
+.wrap .label{font-weight:400}
+/* ================= one page: every section at least one screen tall ================= */
+.screen{min-height:100svh}
+.row.screen{align-content:center}
+#now.screen{display:grid;align-content:center;padding-block:0}
+/* after a game over the page turns light: keep the evidence cards visible */
+.sheet.unfolded .ev-card,.sheet.unfolded .sched .talk{background:var(--paper)}
+/* schedule cards share the evidence cards' surface: no outline, same radius */
+.sched .talk{border:0;border-radius:14px}
+/* gentle snapping on desktop only; phones scroll freely */
+@media (min-width:820px) and (hover:hover){
+  html{scroll-snap-type:y proximity}
+  .snap{scroll-snap-align:start}
+  .footer-spacer{scroll-snap-align:end}
+}
 </style>
 <!-- body -->
 <div class="sheet">
-<header class="hero" id="top">
+<header class="hero snap" id="top">
   <div class="field" id="field" role="group" aria-label="Field of squares. Use the arrow keys to move and Enter to open a square."></div>
   <div class="clickme" id="clickme" aria-hidden="true">Click me</div>
   <div class="card" id="card" role="dialog" aria-labelledby="card-title" hidden>
@@ -224,7 +387,7 @@ footer{padding-left:var(--gutter-l);padding-right:var(--gutter-r);padding-block:
         <p class="offer-by">Gabriel Baude · Principal Product Designer · Fractional</p>
       </section>
       <div class="actions">
-      <a class="float next" href="#now">Now
+      <a class="float next" href="#now">Availability
         <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M6 1v11M1.5 7.5 6 12l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
       <a class="float cta" href="#contact">Discuss your brief
@@ -235,26 +398,140 @@ footer{padding-left:var(--gutter-l);padding-right:var(--gutter-r);padding-block:
   </div>
 </header>
 
-<main class="now" id="now">
-  <div class="inner">
-    <section class="row" aria-labelledby="where">
-      <p class="q">Where are you?</p>
-      <div class="a">
-        <h2 class="statement" id="where">Heads-down on projects, with clients and on my own.</h2>
-        <p class="lede">The rest of the cube is still folded.</p>
-        <p>The work, the writing and the method open in the coming weeks. Come back then, or write to me now if it can't wait.</p>
-        <div class="status">
-          <span class="dot" aria-hidden="true"></span><span>Busy building</span>
-          <span class="sep" aria-hidden="true"></span>
-          <span class="muted">Munich, <span data-clock>--:--</span></span>
+<div class="dotted" id="dotted"><div class="dots-bg" id="dots-bg" aria-hidden="true"></div>
+<div class="wrap"><div class="inner">
+  <section class="row screen snap" id="why" aria-labelledby="why-h">
+    <p class="q">Why now?</p>
+    <div class="a">
+      <h2 class="statement" id="why-h">Your <span class="swap" aria-hidden="true"><span class="swap-w">customers</span></span><span class="sr-only">customers, users, employees and clients</span> have already said what they expect.</h2>
+      <p class="lede">Europeans are worried about privacy, their data and AI. European companies are struggling with uncertainty, skills and unclear rules.</p>
+      <p class="body">Read together, they point to what to build next: products people trust enough to choose, made by teams who know why they build them.</p>
+      <div class="evidence" id="evidence" aria-roledescription="carousel" aria-label="Evidence">
+        <div class="ev-head">
+          <p class="label">Evidence</p>
+          <div class="ev-marks" role="group" aria-label="Choose a card">
+            <button type="button" aria-label="Card 1"></button><button type="button" aria-label="Card 2"></button><button type="button" aria-label="Card 3"></button><button type="button" aria-label="Card 4"></button><button type="button" aria-label="Card 5"></button><button type="button" aria-label="Card 6"></button><button type="button" aria-label="Card 7"></button>
+          </div>
+        </div>
+        <div class="ev-track" id="ev-track" tabindex="0">
+          <article class="ev-card" data-value="88" role="group" aria-roledescription="slide" aria-label="1 of 7">
+            <div class="tiles" aria-hidden="true"></div>
+            <div class="ev-body">
+              <p class="voice">What people say</p>
+              <p class="pct" aria-label="88 percent"><span class="num" aria-hidden="true">88</span><span class="sign" aria-hidden="true">%</span></p>
+              <p class="say">of Europeans are concerned about data security and privacy when using digital services.</p>
+              <p class="src">Schwarz Digits / GIM · 2025 · 14 European countries · 14,000 people</p>
+            </div>
+          </article>
+          <article class="ev-card" data-value="83" role="group" aria-roledescription="slide" aria-label="2 of 7">
+            <div class="tiles" aria-hidden="true"></div>
+            <div class="ev-body">
+              <p class="voice">What companies face</p>
+              <p class="pct" aria-label="83 percent"><span class="num" aria-hidden="true">83</span><span class="sign" aria-hidden="true">%</span></p>
+              <p class="say">of European companies say uncertainty about the future holds back their investment, from equipment to R&amp;D, software and training.</p>
+              <p class="src">EIB Investment Survey · 2025 · ~12,000 EU firms · major or minor obstacle</p>
+            </div>
+          </article>
+          <article class="ev-card" data-value="72" role="group" aria-roledescription="slide" aria-label="3 of 7">
+            <div class="tiles" aria-hidden="true"></div>
+            <div class="ev-body">
+              <p class="voice">What people say</p>
+              <p class="pct" aria-label="72 percent"><span class="num" aria-hidden="true">72</span><span class="sign" aria-hidden="true">%</span></p>
+              <p class="say">of Europeans trust European companies with their data, far more than foreign ones: 20% trust American providers, 8% Chinese.</p>
+              <p class="src">Schwarz Digits / GIM · 2025 · 14 European countries</p>
+            </div>
+          </article>
+          <article class="ev-card" data-value="47" role="group" aria-roledescription="slide" aria-label="4 of 7">
+            <div class="tiles" aria-hidden="true"></div>
+            <div class="ev-body">
+              <p class="voice">What people say</p>
+              <p class="pct" aria-label="47 percent"><span class="num" aria-hidden="true">47</span><span class="sign" aria-hidden="true">%</span></p>
+              <p class="say">of Europeans feel personally affected by the misuse of personal data.</p>
+              <p class="src">Digital Decade Eurobarometer · 2026</p>
+            </div>
+          </article>
+          <article class="ev-card" data-value="70" role="group" aria-roledescription="slide" aria-label="5 of 7">
+            <div class="tiles" aria-hidden="true"></div>
+            <div class="ev-body">
+              <p class="voice">What companies face</p>
+              <p class="pct" aria-label="70 percent"><span class="num" aria-hidden="true">70</span><span class="sign" aria-hidden="true">%</span></p>
+              <p class="say">of EU firms that considered AI and stopped say they lacked the expertise.</p>
+              <p class="src">Eurostat · 2025 · the 11% of EU firms that considered AI</p>
+            </div>
+          </article>
+          <article class="ev-card" data-value="54" role="group" aria-roledescription="slide" aria-label="6 of 7">
+            <div class="tiles" aria-hidden="true"></div>
+            <div class="ev-body">
+              <p class="voice">What companies face</p>
+              <p class="pct" aria-label="54 percent"><span class="num" aria-hidden="true">54</span><span class="sign" aria-hidden="true">%</span></p>
+              <p class="say">of European companies that considered AI say they weren&#x27;t clear on the legal consequences of using it.</p>
+              <p class="src">Eurostat · 2025 · the 11% of EU firms that considered AI</p>
+            </div>
+          </article>
+          <article class="ev-card" data-value="84" role="group" aria-roledescription="slide" aria-label="7 of 7">
+            <div class="tiles" aria-hidden="true"></div>
+            <div class="ev-body">
+              <p class="voice">What people say</p>
+              <p class="pct" aria-label="84 percent"><span class="num" aria-hidden="true">84</span><span class="sign" aria-hidden="true">%</span></p>
+              <p class="say">of Europeans think AI at work needs careful management to protect privacy and ensure transparency.</p>
+              <p class="src">Eurobarometer · AI and the future of work · 2025</p>
+            </div>
+          </article>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="row" id="lecture" aria-labelledby="talk">
-      <p class="q">Where can I hear you?</p>
-      <div class="a">
-        <article class="talk">
+  <section class="row screen snap" id="who" aria-labelledby="who-h">
+    <p class="q">Who runs the cube?</p>
+    <div class="a">
+      <h2 class="statement" id="who-h">I've been building with AI since 2011.</h2>
+      <p class="lede">I've trained models and built the datasets behind them, and seen how a dataset's quality shapes what a model can do. I know why LLMs carry bias, and that they are one kind of AI among many, often not the right one.</p>
+      <p class="body">So my first question is never which model. It's why you want AI, and what it changes for your company: where it becomes leverage for your people to grow the business. The core of your business isn't your technology. It's your people.</p>
+      <ul class="track">
+        <li><span class="y">2018–2024</span><span class="r">Director of Innovation &amp; Creative Technology, Kaiser X Labs (Allianz) <em>· built Senz, an AI sketch-to-prototype platform</em></span></li>
+        <li><span class="y">2012–2015</span><span class="r">Head of Innovation &amp; UX Design, Huawei, Shenzhen <em>· machine learning and computer vision for gaze-driven interaction</em></span></li>
+        <li><span class="y">2009–2012</span><span class="r">Founder, Mushi Crew</span></li>
+        <li><span class="y">Earlier</span><span class="r">Innovation at Orange and Etisalat <em>· connected TV and video on demand</em>; lecturer at Université Paris XIII</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="row screen snap" id="what" aria-labelledby="what-h">
+    <div class="what-field" id="what-field" aria-hidden="true"></div>
+    <p class="q">What happens when we work together?</p>
+    <div class="a">
+      <h2 class="statement" id="what-h">One method, six faces.</h2>
+      <div class="method" id="method">
+        <ol class="steps" id="steps">
+          <li data-step="1"><span class="n">01</span><h3>Listen</h3><p>Your brief describes what hurts. I listen for what it doesn't say.</p></li>
+          <li data-step="2"><span class="n">02</span><h3>Question</h3><p>We look for the question underneath: why this, why now, and for whom.</p></li>
+          <li data-step="3"><span class="n">03</span><h3>Prototype</h3><p>A first answer, built quickly, so we have something real to react to.</p></li>
+          <li data-step="4"><span class="n">04</span><h3>Reframe</h3><p>The prototype shows what the brief left out. That is where the real problem appears.</p></li>
+          <li data-step="5"><span class="n">05</span><h3>Abstain</h3><p>We decide what not to build, collect or automate. What remains is stronger for it.</p></li>
+          <li data-step="6"><span class="n">06</span><h3>Hand over</h3><p>You keep an answer your own people can run, explain and grow.</p></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+</div></div>
+
+<main class="now screen snap" id="now">
+  <div class="inner">
+    <section class="row" id="schedule" aria-labelledby="sched-q">
+      <p class="q" id="sched-q">What's on your schedule?</p>
+      <div class="a sched">
+        <article class="talk busy" aria-labelledby="where">
+          <div class="talk-top">
+            <span class="label">Now</span>
+            <span class="chip" id="booked">Booked until 16 Nov</span>
+          </div>
+          <h3 id="where">Heads-down on projects, with clients and on my own.</h3>
+          <p class="meta"><span>The rest of the cube is still folded.</span><span class="venue">Munich, <span data-clock>--:--</span></span></p>
+          <p class="note">The work, the writing and the method open in the coming weeks. Come back then, or write to me now if it can't wait.</p>
+        </article>
+        <article class="talk" id="lecture" aria-labelledby="talk">
           <div class="talk-top">
             <span class="label">Lecture</span>
             <span class="chip" id="countdown">11 Nov</span>
@@ -266,37 +543,67 @@ footer{padding-left:var(--gutter-l);padding-right:var(--gutter-r);padding-block:
       </div>
     </section>
 
-    <section class="row" id="contact" aria-labelledby="talk-to-me">
-      <p class="q">Can we talk anyway?</p>
-      <div class="a">
-        <h2 class="statement" id="talk-to-me">Yes. Bring the brief.</h2>
-        <p>Especially if it describes symptoms and you can't name the problem yet.</p>
-        <div class="mail">
-          <a id="mail-link" href="mailto:hello@thecu.be"><span data-email>hello@thecu.be</span></a>
-          <button class="btn" id="copy" type="button">Copy address</button>
-        </div>
-        <p class="also">Or follow along on <a id="li-link" href="https://www.linkedin.com/in/gabrielbaude/" target="_blank" rel="noopener">LinkedIn</a>.</p>
-      </div>
-    </section>
   </div>
 </main>
+</div>
 
-<footer>
-  <div class="inner">
-    <div class="foot-row">
-      <span>thecu.be · © 2026 Gabriel Baude</span>
-      <span>No cookies. No trackers. No third-party requests.</span>
-    </div>
-    <details class="legal">
-      <summary>Impressum &amp; privacy</summary>
-      <div class="legal-body">
-        <p><strong>Angaben gemäß § 5 DDG</strong><br>Gabriel Baude<br>[Street and number]<br>[Postcode] München, Germany<br>E-Mail: <span data-email>hello@thecu.be</span><br>USt-IdNr.: [DE…]</p>
-        <p><strong>Privacy</strong><br>This page sets no cookies, loads nothing from third parties and runs no analytics. Its fonts are embedded in the page. To deliver it, the hosting provider processes your IP address in standard server logs.</p>
+</div>
+<div class="footer-spacer" id="contact" aria-hidden="true"></div>
+<footer class="reveal" id="reveal">
+  <div class="reveal-in">
+    <div class="r-row">
+      <div class="r-side">
+        <p class="r-q">Can we talk?</p>
+        <p class="r-label">References</p>
+        <ul class="r-refs">
+          <li><span class="r-fig">88% · 72%</span><a href="https://schwarz-digits.de/en/presse/archive/2025/europe-s-digital-paradox-citizens-feel-abandoned-by-companies-and-authorities-on-cybersecurity-yet-they-also-don-t-protect-themselves" target="_blank" rel="noopener noreferrer">Schwarz Digits / GIM, Europe&#x27;s digital paradox (2025)</a></li>
+          <li><span class="r-fig">83%</span><a href="https://www.eib.org/attachments/lucalli/20250216-141025-econ-eibis-2025-eu-en.pdf" target="_blank" rel="noopener noreferrer">EIB Investment Survey 2025, EU overview (PDF)</a></li>
+          <li><span class="r-fig">47%</span><a href="https://digital-strategy.ec.europa.eu/en/factpages/childrens-protection-online-high-priority-92-europeans" target="_blank" rel="noopener noreferrer">European Commission, Digital Decade Eurobarometer 2026</a></li>
+          <li><span class="r-fig">70% · 54%</span><a href="https://ai.bcci.bg/en/news/why-companies-that-considered-ai-decided-against-it" target="_blank" rel="noopener noreferrer">Eurostat 2025 (isoc_eb_ai), via the BCCI AI Council</a></li>
+          <li><span class="r-fig">84%</span><a href="https://digital-strategy.ec.europa.eu/en/news/commission-survey-shows-most-europeans-support-use-artificial-intelligence-workplace" target="_blank" rel="noopener noreferrer">European Commission, Eurobarometer on AI and the future of work (2025)</a></li>
+        </ul>
       </div>
-    </details>
+      <div class="r-a">
+        <h2 class="r-statement">Yes. Bring the brief.</h2>
+        <p class="r-lede">Especially if it describes symptoms and you can&#x27;t name the problem yet.</p>
+        <div class="r-mail">
+          <a id="r-mail-link" href="mailto:hello@thecu.be">hello@thecu.be</a>
+          <button class="r-btn" id="r-copy" type="button">Copy address</button>
+        </div>
+        <div class="r-legal"><span>thecu.be · © 2026 Gabriel Baude</span><span>No cookies. No trackers. No third-party requests.</span><a class="r-imp-link" href="#impressum" id="imp-open">Impressum &amp; privacy</a></div>
+      </div>
+    </div>
   </div>
 </footer>
-</div>
+
+
+<dialog class="legal" id="impressum" aria-labelledby="legal-title">
+  <div class="legal-head">
+    <h2 id="legal-title">Impressum &amp; privacy</h2>
+    <button type="button" class="legal-close" id="imp-close">Close</button>
+  </div>
+  <div class="legal-body">
+            <section>
+              <h4>Impressum</h4>
+              <p>Angaben gemäß § 5 DDG</p>
+              <p>Gabriel Baude<br>Menzinger Straße 14a<br>80638 München<br>Deutschland</p>
+              <p>E-Mail: hello@thecu.be<br>Telefon: +49 155 6157 8061</p>
+              <p>Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG: DE463729451</p>
+              <p>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV: Gabriel Baude, Anschrift wie oben.</p>
+              <p>Ich bin weder bereit noch verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+            </section>
+            <section>
+              <h4>Privacy</h4>
+              <p><strong>Who is responsible.</strong> Gabriel Baude, address above, hello@thecu.be.</p>
+              <p><strong>What this page doesn't do.</strong> It sets no cookies, stores nothing on your device, runs no analytics and loads nothing from other servers: its fonts and images are part of the page. The "Copy address" button only writes to your own clipboard.</p>
+              <p><strong>Hosting and server logs.</strong> The page runs on a server rented from OVH SAS, 2 rue Kellermann, 59100 Roubaix, France, in a data centre in the European Union. OVH acts on my behalf under a data processing agreement (Art. 28 GDPR). To deliver the page, the web server records your IP address, the date and time, the page requested, the referring page and your browser's user agent. This is needed to send you the page and keep it secure and working, which is my legitimate interest (Art. 6(1)(f) GDPR). Nothing is transferred outside the EU. I don't use these logs to identify anyone, and they are deleted automatically after 14 days.</p>
+              <p><strong>When you write to me.</strong> I use your email address and message to answer you and, if we work together, to prepare and carry out that work (Art. 6(1)(b) GDPR), otherwise on the basis of my interest in replying (Art. 6(1)(f) GDPR). Emails are stored with my mail provider, [provider], acting on my behalf. I delete them when they're no longer needed, unless tax law requires me to keep business correspondence for longer.</p>
+              <p><strong>Links.</strong> Links to the sources of the figures only take you to those sites when you click them. From then on, their privacy policies apply.</p>
+              <p><strong>Your rights.</strong> You can ask me for access to your data (Art. 15), its correction (Art. 16), deletion (Art. 17), restricted processing (Art. 18) and a copy in a portable format (Art. 20). You can object at any time to processing based on legitimate interest (Art. 21). You may also complain to a data protection authority, for example the Bayerisches Landesamt für Datenschutzaufsicht, Promenade 18, 91522 Ansbach, lda.bayern.de.</p>
+              <p>No automated decisions or profiling take place. Last updated: November 2026.</p>
+            </section>
+  </div>
+</dialog>
 
 <script>
 (() => {
@@ -307,23 +614,6 @@ footer{padding-left:var(--gutter-l);padding-right:var(--gutter-r);padding-block:
 
   const TZ = "Europe/Berlin";
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  /* contact */
-  document.querySelectorAll("[data-email]").forEach(e => e.textContent = CONTACT_EMAIL);
-  document.getElementById("mail-link").href = "mailto:" + CONTACT_EMAIL;
-  document.getElementById("li-link").href = LINKEDIN_URL;
-  const copyBtn = document.getElementById("copy");
-  copyBtn.addEventListener("click", () => {
-    const done = () => { copyBtn.textContent = "Copied"; setTimeout(() => copyBtn.textContent = "Copy address", 2000); };
-    const fallback = () => {
-      const el = document.querySelector("#mail-link [data-email]");
-      const r = document.createRange(); r.selectNodeContents(el);
-      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
-      copyBtn.textContent = "Selected, press copy";
-      setTimeout(() => copyBtn.textContent = "Copy address", 2600);
-    };
-    try { navigator.clipboard.writeText(CONTACT_EMAIL).then(done, fallback); } catch (e) { fallback(); }
-  });
 
   /* Munich clock */
   const fmtTime = new Intl.DateTimeFormat("en-GB", { timeZone: TZ, hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
@@ -336,6 +626,11 @@ footer{padding-left:var(--gutter-l);padding-right:var(--gutter-r);padding-block:
   const days = Math.round((Date.UTC(TALK_DATE[0], TALK_DATE[1] - 1, TALK_DATE[2]) - Date.UTC(get("year"), get("month") - 1, get("day"))) / 864e5);
   const chip = document.getElementById("countdown");
   chip.textContent = days > 1 ? "In " + days + " days" : days === 1 ? "Tomorrow" : days === 0 ? "Today" : "Given";
+
+  /* availability: booked until this Berlin date, then open for new briefs */
+  const FREE_FROM = [2026, 11, 16];
+  const toFree = Math.round((Date.UTC(FREE_FROM[0], FREE_FROM[1] - 1, FREE_FROM[2]) - Date.UTC(get("year"), get("month") - 1, get("day"))) / 864e5);
+  if (toFree <= 0) document.getElementById("booked").textContent = "Available now";
 
   /* ---- offer card: slides advance on their own, can be swiped or picked ---- */
   (() => {
@@ -674,5 +969,216 @@ footer{padding-left:var(--gutter-l);padding-right:var(--gutter-r);padding-block:
       else if (!card.hidden && lastIdx >= 0) placeCard(lastIdx);
     }, 120);
   });
+})();
+</script>
+<script>
+(() => {
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const STEP_MS = 16; /* one tile every 16 ms: the counters pile up in about 1.5 s */
+
+  /* ---- footer reveal: the page lifts off a dark footer fixed behind it ---- */
+  (() => {
+    const spacer = document.getElementById("contact"), foot = document.getElementById("reveal");
+    const fit = () => {
+      foot.classList.remove("static");
+      const h = foot.offsetHeight;
+      if (h > window.innerHeight * .92) { foot.classList.add("static"); spacer.style.height = "0px"; }
+      else spacer.style.height = h + "px";
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    /* Impressum & privacy: opens over the page, closes with the button, Esc or a click outside */
+    const legal = document.getElementById("impressum"), legalOpen = document.getElementById("imp-open");
+    const showLegal = () => { if (!legal.open) { legal.showModal(); legal.querySelector(".legal-body").scrollTop = 0; } };
+    legalOpen.addEventListener("click", e => { e.preventDefault(); showLegal(); });
+    document.getElementById("imp-close").addEventListener("click", () => legal.close());
+    legal.addEventListener("click", e => { if (e.target === legal) legal.close(); });
+    legal.addEventListener("close", () => legalOpen.focus({ preventScroll: true }));
+    /* a direct link to thecu.be/#impressum opens it straight away */
+    const fromHash = () => { if (location.hash === "#impressum") showLegal(); };
+    fromHash(); window.addEventListener("hashchange", fromHash);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    const btn = document.getElementById("r-copy"), mail = "hello@thecu.be";
+    btn.addEventListener("click", () => {
+      const ok = () => { btn.textContent = "Copied"; setTimeout(() => btn.textContent = "Copy address", 2000); };
+      try { navigator.clipboard.writeText(mail).then(ok, () => {}); } catch (e) {}
+    });
+  })();
+
+  /* ---- why headline: the changing word is deleted and retyped ---- */
+  (() => {
+    const WORDS = ["customers", "users", "employees", "clients"]; /* edit the list here */
+    const w = document.querySelector(".swap-w");
+    if (!w || reduce) return;
+    const TYPE = 85, DELETE = 45, HOLD = 2200, GAP = 260;
+    let k = 0;
+    const wait = ms => new Promise(r => setTimeout(r, ms));
+    const run = async () => {
+      w.classList.add("typing");
+      for (;;) {
+        await wait(HOLD);
+        while (document.hidden) await wait(500);
+        const word = w.textContent;
+        for (let n = word.length; n > 0; n--) { w.textContent = word.slice(0, n - 1); await wait(DELETE); }
+        await wait(GAP);
+        k = (k + 1) % WORDS.length;
+        const next = WORDS[k];
+        for (let n = 1; n <= next.length; n++) { w.textContent = next.slice(0, n); await wait(TYPE + Math.random() * 40); }
+      }
+    };
+    run();
+  })();
+
+  /* ---- why: a carousel of evidence; tiles pile up and digits spin when a card comes round ---- */
+  const ev = document.getElementById("evidence"), track = document.getElementById("ev-track");
+  const cards = [...track.querySelectorAll(".ev-card")];
+  const marks = [...ev.querySelectorAll(".ev-marks button")];
+  const order = []; /* bottom-left first, row by row upward */
+  for (let r = 9; r >= 0; r--) for (let c = 0; c < 10; c++) order.push(r * 10 + c);
+  cards.forEach(cd => {
+    const tiles = cd.querySelector(".tiles");
+    for (let i = 0; i < 100; i++) tiles.appendChild(document.createElement("i"));
+    cd._cells = [...tiles.children];
+    const v = +cd.dataset.value || 0;
+    if (!v) return;
+    const full = Math.floor(v), half = v - full >= .5;
+    cd._lit = () => { order.slice(0, full).forEach(i => cd._cells[i].classList.add("lit")); if (half) cd._cells[order[full]].classList.add("half"); };
+    if (reduce) cd._lit();  /* without motion, show the answer straight away */
+    /* number as spinning reels: each digit a strip of 0–9, three times over */
+    const num = cd.querySelector(".num");
+    num.innerHTML = "";
+    cd._reels = cd.dataset.value.split("").map(ch => {
+      if (ch === ".") { const dot = document.createElement("span"); dot.className = "dot-sep"; dot.textContent = "."; num.appendChild(dot); return null; }
+      const dg = document.createElement("span"); dg.className = "digit";
+      const reel = document.createElement("span"); reel.className = "reel";
+      for (let k = 0; k < 30; k++) { const sp = document.createElement("span"); sp.textContent = k % 10; reel.appendChild(sp); }
+      reel.style.transform = reduce ? "translateY(-" + (20 + +ch) + "em)" : "translateY(0)"; /* counters start at zero */
+      dg.appendChild(reel); num.appendChild(dg);
+      return { reel, d: +ch };
+    }).filter(Boolean);
+  });
+  /* back to zero: empty tiles, counters at 0 */
+  const reset = cd => {
+    if (!cd._cells || reduce) return;
+    cd._cells.forEach(c => { c.classList.remove("lit", "half"); c.style.removeProperty("--d"); });
+    (cd._reels || []).forEach(r => { r.reel.style.transition = "none"; r.reel.style.transitionDelay = ""; r.reel.style.transform = "translateY(0)"; });
+  };
+  const play = cd => {
+    const v = +cd.dataset.value || 0;
+    if (!v || reduce) return;
+    cd._cells.forEach(c => { c.classList.remove("lit", "half"); c.style.removeProperty("--d"); });
+    cd._reels.forEach(r => { r.reel.style.transition = "none"; r.reel.style.transform = "translateY(0)"; });
+    void cd.offsetWidth;
+    const full = Math.floor(v);
+    order.slice(0, full).forEach((i, k) => { const c = cd._cells[i]; c.style.setProperty("--d", k * 14 + "ms"); c.classList.add("lit"); });
+    if (v - full >= .5) { const c = cd._cells[order[full]]; c.style.setProperty("--d", full * 14 + "ms"); c.classList.add("half"); }
+    cd._reels.forEach((r, k) => {
+      r.reel.style.transition = "";
+      r.reel.style.transitionDelay = k * 140 + "ms";
+      r.reel.style.transform = "translateY(-" + (20 + r.d) + "em)";
+    });
+  };
+  let idx = 0, inView = false, holdUntil = 0, hover = false, playedIdx = -1;
+  const mark = () => marks.forEach((m, j) => m.setAttribute("aria-current", j === idx ? "true" : "false"));
+  /* let the track break out of the column to the full screen width */
+  const setBleed = () => {
+    const left = Math.max(0, ev.getBoundingClientRect().left);
+    track.style.setProperty("--bleed", left + "px");
+    track.style.setProperty("--vw", document.documentElement.clientWidth + "px");
+    track.style.setProperty("--card", Math.round(Math.min(640, ev.clientWidth * .88)) + "px");
+  };
+  setBleed();
+  const step = () => cards[1] ? cards[1].offsetLeft - cards[0].offsetLeft : track.clientWidth;
+  const go = k => { idx = (k + cards.length) % cards.length; track.scrollTo({ left: idx * step(), behavior: reduce ? "auto" : "smooth" }); mark(); };
+  /* each card animates once, the first time it reaches the centre, then stays filled */
+  const done = new Set();
+  const maybePlay = () => {
+    if (!inView || done.has(idx)) return;
+    done.add(idx); playedIdx = idx;
+    play(cards[idx]);
+  };
+  let st = 0;
+  track.addEventListener("scroll", () => {
+    const k = Math.round(track.scrollLeft / step());
+    if (k !== idx) { idx = Math.max(0, Math.min(cards.length - 1, k)); mark(); }
+    clearTimeout(st); st = setTimeout(maybePlay, 120);
+  }, { passive: true });
+  marks.forEach((m, j) => m.addEventListener("click", () => { holdUntil = performance.now() + 9000; go(j); }));
+  ["pointerdown", "wheel", "touchstart", "keydown"].forEach(e => track.addEventListener(e, () => { holdUntil = performance.now() + 9000; }, { passive: true }));
+  ev.addEventListener("pointerenter", () => { hover = true; });
+  ev.addEventListener("pointerleave", () => { hover = false; });
+  window.addEventListener("resize", () => { setBleed(); track.scrollTo({ left: idx * step() }); });
+  mark();
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(([en]) => { inView = en.isIntersecting; if (inView) maybePlay(); }, { threshold: .45 }).observe(track);
+  }
+  const AUTOPLAY = false; /* paused while the cards are being reviewed; set to true to advance every 6.5 s */
+  if (AUTOPLAY && !reduce) setInterval(() => { if (!inView || hover || document.hidden || performance.now() < holdUntil) return; go(idx + 1); }, 6500);
+
+  /* ---- what: a step opens a patch of tiles in the background, like the field ---- */
+  (() => {
+    const section = document.getElementById("what");
+    const field = document.getElementById("what-field");
+    const items = [...document.querySelectorAll("#steps li")];
+    let cols = 0, rows = 0, size = 58, cells = [];
+    const build = () => {
+      const W = field.clientWidth, H = field.clientHeight;
+      size = W < 600 ? 48 : 58;
+      cols = Math.ceil(W / size); rows = Math.ceil(H / size);
+      field.style.setProperty("--size", size + "px");
+      field.style.gridTemplateColumns = "repeat(" + cols + ", " + size + "px)";
+      field.innerHTML = ""; cells = [];
+      const frag = document.createDocumentFragment();
+      for (let k = 0; k < cols * rows; k++) { const c = document.createElement("i"); frag.appendChild(c); cells.push(c); }
+      field.appendChild(frag);
+      align();
+    };
+    /* one grid for the whole page: the dotted ground and the method's tiles share columns and rows */
+    const host = document.getElementById("dotted"), dots = document.getElementById("dots-bg");
+    function align() {
+      const W = field.clientWidth, left0 = (W - cols * size) / 2;
+      const off = section.getBoundingClientRect().top - host.getBoundingClientRect().top;
+      field.style.top = -(((off % size) + size) % size) + "px";
+      const c = size / 2 - 1;
+      dots.style.backgroundImage = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='" + size + "' height='" + size + "'%3E%3Crect x='" + c + "' y='" + c + "' width='2' height='2' fill='%23A8A8A5'/%3E%3C/svg%3E\")";
+      dots.style.backgroundPosition = left0 + "px 0px";
+    }
+    if ("ResizeObserver" in window) new ResizeObserver(() => align()).observe(host);
+    const close = () => cells.forEach(c => { if (c.classList.contains("open")) { c.classList.remove("open", "mine"); c.style.removeProperty("--d"); } });
+    /* open tiles in a wave around a point (viewport coordinates) */
+    const reveal = (px, py) => {
+      close();
+      const fr = field.getBoundingClientRect();
+      const left0 = fr.left + (fr.width - cols * size) / 2;
+      const x = px - left0, y = py - fr.top, R = 3.2;
+      cells.forEach((c, k) => {
+        const cx = (k % cols + .5) * size, cy = (Math.floor(k / cols) + .5) * size;
+        const d = Math.hypot(cx - x, cy - y) / size;
+        if (d > R + (Math.random() - .5) * 1.2) return;
+        c.style.setProperty("--d", reduce ? "0ms" : Math.round(d * 40) + "ms");
+        void c.offsetWidth;
+        c.classList.add("open");
+        if (Math.random() < .1) c.classList.add("mine");
+      });
+    };
+    const setOn = li => items.forEach(x => x.classList.toggle("on", x === li));
+    build();
+    let rt = 0;
+    window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(build, 150); });
+
+    const canHover = window.matchMedia("(hover: hover)").matches;
+    if (canHover) {
+      items.forEach(li => li.addEventListener("pointerenter", e => { setOn(li); reveal(e.clientX, e.clientY); }));
+      document.getElementById("steps").addEventListener("pointerleave", () => { setOn(null); close(); });
+    } else if ("IntersectionObserver" in window) {
+      /* phones: the step in the middle of the screen opens its patch */
+      const io = new IntersectionObserver(entries => entries.forEach(en => {
+        if (!en.isIntersecting) return;
+        const li = en.target, h = li.querySelector("h3").getBoundingClientRect();
+        setOn(li); reveal(h.left + h.width / 2, h.top + h.height / 2);
+      }), { rootMargin: "-45% 0px -45% 0px" });
+      items.forEach(li => io.observe(li));
+    }
+  })();
 })();
 </script>
