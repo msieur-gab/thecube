@@ -1,3 +1,5 @@
+import { reduce } from "../utils/motion.js";
+
 /* ---- logo: one cube, one solid face, one hatched face ---- */
 export function initCubeMark() {
   const mk = document.getElementById("mark"), mc = mk.getContext("2d");
@@ -5,6 +7,7 @@ export function initCubeMark() {
   const ink = css.getPropertyValue("--ink").trim() || "#141414";
   const acc = css.getPropertyValue("--accent").trim() || "#E4FE00";
   const D = 2.6;
+  const INSIDE = .14; /* how dark the inside of the cube shows through the hatching */
   let mw = 0, yaw = 0;
   const box = document.getElementById("mark-box"), text = document.getElementById("title-text");
   const size = () => {
@@ -23,13 +26,17 @@ export function initCubeMark() {
       const x = Math.SQRT1_2 * Math.sin(a), z = Math.SQRT1_2 * Math.cos(a), f = D / (D - z);
       return [cx + x * f * S, cy - y * f * S];
     };
-    const fs = [];
+    const fs = [], back = [];
     for (let fi = 0; fi < 4; fi++) {
       const th = yaw + fi * Math.PI / 2, nx = Math.sin(th), nz = Math.cos(th);
-      if (nx * -.5 * nx + nz * (D - .5 * nz) <= 0) continue;
-      fs.push({ solid: fi % 2 === 0, z: nz, B0: pt(th - Math.PI / 4, -.5), B1: pt(th + Math.PI / 4, -.5), T1: pt(th + Math.PI / 4, .5), T0: pt(th - Math.PI / 4, .5) });
+      const face = { solid: fi % 2 === 0, z: nz, B0: pt(th - Math.PI / 4, -.5), B1: pt(th + Math.PI / 4, -.5), T1: pt(th + Math.PI / 4, .5), T0: pt(th - Math.PI / 4, .5) };
+      (nx * -.5 * nx + nz * (D - .5 * nz) <= 0 ? back : fs).push(face);
     }
     fs.sort((a, b) => a.z - b.z);
+    /* the inside of the cube: the far faces, in a soft shade of ink, seen through the hatching */
+    mc.beginPath();
+    for (const f of back) { mc.moveTo(...f.B0); mc.lineTo(...f.B1); mc.lineTo(...f.T1); mc.lineTo(...f.T0); mc.closePath(); }
+    mc.globalAlpha = INSIDE; mc.fillStyle = ink; mc.fill(); mc.globalAlpha = 1;
     mc.lineCap = "round"; mc.lineJoin = "round"; mc.strokeStyle = ink;
     for (const f of fs) {
       if (f.solid) {
@@ -47,9 +54,24 @@ export function initCubeMark() {
       }
     }
   };
-  /* a different angle on each visit: one of the steps of a quarter turn (never fully front-on) */
-  yaw = (1 + Math.floor(Math.random() * 15)) / 16 * Math.PI / 2;
+  /* a different angle on each visit: any quarter of the full turn, one of its steps (never fully front-on) */
+  yaw = (Math.floor(Math.random() * 4) * 16 + 1 + Math.floor(Math.random() * 15)) / 16 * Math.PI / 2;
   size(); draw();
   window.addEventListener("resize", () => { size(); draw(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { size(); draw(); });
+
+  /* pointing at the logo (cube or name) spins it; leaving lets it slow down and rest where it is */
+  const title = box.closest(".title");
+  if (!title || reduce) return;
+  const SPIN = Math.PI * 2 / 3; /* full speed: one turn every 3 s */
+  let speed = 0, target = 0, last = 0, raf = 0;
+  const step = t => {
+    const dt = last ? Math.min(.05, (t - last) / 1000) : 0; last = t;
+    speed += (target - speed) * Math.min(1, dt * 4); /* eases in and out over about a second */
+    yaw += speed * dt; draw();
+    if (target || speed > .02) raf = requestAnimationFrame(step);
+    else { raf = 0; last = 0; speed = 0; }
+  };
+  title.addEventListener("pointerenter", () => { target = SPIN; if (!raf) raf = requestAnimationFrame(step); });
+  title.addEventListener("pointerleave", () => { target = 0; });
 }
