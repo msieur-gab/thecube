@@ -31,5 +31,6 @@ a{color:inherit}
 .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
 /* ---------- sheet ---------- */
-.sheet{background:var(--paper);overflow:hidden;transition:background-color .9s ease}
+/* clip, not hidden: hidden makes the sheet its own scroll box, which steals the sections' snap points from the page (hidden stays as a fallback for old browsers) */
+.sheet{background:var(--paper);overflow:hidden;overflow:clip;transition:background-color .9s ease}
 .sheet.unfolded{background:var(--surface)}
