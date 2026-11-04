@@ -15,7 +15,7 @@
 .cell.mine{background:var(--mine);cursor:pointer}
 .cell.mine::after{content:"";width:4px;height:4px;background:var(--accent)}
 .pips{display:flex;flex-wrap:wrap;justify-content:center;gap:3px;width:calc(var(--c) * 4px + (var(--c) - 1) * 3px)}
-.pips i{width:4px;height:4px;background:var(--mine)} /* the counts on a revealed tile: the same grey as a revealed perspective */
+.pips i{width:4px;height:4px;background:var(--count)} /* the counts on a revealed tile */
 .clickme{position:absolute;z-index:4;left:0;top:0;padding:4px 8px;background:var(--ink);color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s}
 .clickme.on{opacity:1}
 

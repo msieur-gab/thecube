@@ -12,6 +12,7 @@
   --closed:#DEDEDC;
   --flash:#B8B8B5; /* a tile starts its reveal here, so the wave reads */
   --hover:#E6E6E4;
+  --count:#CFCFCE; /* the small squares counting nearby perspectives on a revealed tile */
   --pip:#9A9A97; /* the dots of the field, the dotted ground and the evidence tiles */
   --mono:"DM Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
   --display:"Schibsted Grotesk","Helvetica Neue",Arial,sans-serif;
