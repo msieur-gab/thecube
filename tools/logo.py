@@ -14,12 +14,15 @@ from PIL import Image, ImageDraw
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets" / "logo"
 
-INK, ACCENT, WHITE = "#141414", "#E4FE00", "#FFFFFF"
-COLOURWAYS = {               # name: (solid face, hatching)
-    "yellow-black": (ACCENT, INK),
-    "black": (INK, INK),
-    "white": (WHITE, WHITE),
+INK, ACCENT, WHITE, PAPER, SHADE = "#141414", "#E4FE00", "#FFFFFF", "#DEDEDC", "#000000"
+COLOURWAYS = {               # name: (solid face, hatching, inside shade opacity, GIF background)
+    "yellow-black": (ACCENT, INK, .12, PAPER),   # as on the site
+    "black": (INK, INK, .12, WHITE),
+    "white": (WHITE, WHITE, .45, INK),
 }
+# The inside of the cube is a shade of black, so it always reads darker than what is behind it
+# (as in the reference). SVGs keep it see-through; GIFs cannot (their transparency is on/off),
+# so each GIF has a solid background.
 D = 2.6                      # camera distance, as on the page
 
 
@@ -33,17 +36,16 @@ def faces(yaw, mw):
         f = D / (D - z)
         return (cx + x * f * S, cy - y * f * S)
 
-    fs = []
+    fs, back = [], []
     for fi in range(4):
         th = yaw + fi * math.pi / 2
         nx, nz = math.sin(th), math.cos(th)
-        if nx * -.5 * nx + nz * (D - .5 * nz) <= 0:
-            continue
-        fs.append({"solid": fi % 2 == 0, "z": nz,
-                   "B0": pt(th - math.pi / 4, -.5), "B1": pt(th + math.pi / 4, -.5),
-                   "T1": pt(th + math.pi / 4, .5), "T0": pt(th - math.pi / 4, .5)})
+        face = {"solid": fi % 2 == 0, "z": nz,
+                "B0": pt(th - math.pi / 4, -.5), "B1": pt(th + math.pi / 4, -.5),
+                "T1": pt(th + math.pi / 4, .5), "T0": pt(th - math.pi / 4, .5)}
+        (back if nx * -.5 * nx + nz * (D - .5 * nz) <= 0 else fs).append(face)
     fs.sort(key=lambda f: f["z"])
-    return fs
+    return back, fs
 
 
 def lp(a, b, t):
@@ -59,10 +61,12 @@ def hatches(f, G=6, d=.055):
             yield at(u - d, v - d), at(u + d, v + d)
 
 
-def svg(yaw, solid, hatch, mw=100):
+def svg(yaw, solid, hatch, inside, mw=100):
     n = lambda p: f"{p[0]:.2f},{p[1]:.2f}"
-    parts = []
-    for f in faces(yaw, mw):
+    back, front = faces(yaw, mw)
+    quad = lambda f: f'M{n(f["B0"])}L{n(f["B1"])}L{n(f["T1"])}L{n(f["T0"])}Z'
+    parts = [f'<path d="{"".join(quad(f) for f in back)}" fill="{SHADE}" fill-opacity="{inside}"/>']
+    for f in front:
         if f["solid"]:
             parts.append(f'<path d="M{n(f["B0"])}L{n(f["B1"])}L{n(f["T1"])}L{n(f["T0"])}Z" fill="{solid}"/>')
         else:
@@ -72,12 +76,17 @@ def svg(yaw, solid, hatch, mw=100):
             + "".join(parts) + "</svg>\n")
 
 
-def frame(yaw, solid, hatch, px=512, ss=4):
+def frame(yaw, solid, hatch, inside, px=512, ss=4):
     """One RGBA frame, drawn at ss times the size and scaled down for smooth edges."""
     mw = px * ss
-    im = Image.new("RGBA", (mw, mw), (0, 0, 0, 0))
+    back, front = faces(yaw, mw)
+    shade = Image.new("L", (mw, mw), 0)
+    for f in back:                                            # the inside, seen through the hatching
+        ImageDraw.Draw(shade).polygon([f["B0"], f["B1"], f["T1"], f["T0"]], fill=round(255 * inside))
+    im = Image.new("RGBA", (mw, mw), SHADE)
+    im.putalpha(shade)
     dr = ImageDraw.Draw(im)
-    for f in faces(yaw, mw):
+    for f in front:
         if f["solid"]:
             dr.polygon([f["B0"], f["B1"], f["T1"], f["T0"]], fill=solid)
         else:
@@ -86,40 +95,26 @@ def frame(yaw, solid, hatch, px=512, ss=4):
     return im.resize((px, px), Image.LANCZOS)
 
 
-def gif(path, solid, hatch, matte, seconds=3.0, fps=20, px=512):
-    """A half turn that loops as a continuous rotation; transparent outside the cube.
-    GIF transparency is on/off, so soft edges are blended onto `matte` (the background it suits)."""
+def gif(path, solid, hatch, inside, bg, seconds=3.0, fps=20, px=512):
+    """A half turn on a solid background; it loops as a continuous rotation."""
     n = round(seconds * fps)
-    mr, mg, mb = Image.new("RGB", (1, 1), matte).getpixel((0, 0))
     frames = []
     for k in range(n):
-        rgba = frame(k / n * math.pi, solid, hatch, px)
-        bg = Image.new("RGBA", rgba.size, (mr, mg, mb, 255))
-        flat = Image.alpha_composite(bg, rgba).convert("RGB")
-        clear = rgba.getchannel("A").point(lambda a: 255 if a < 96 else 0)
-        frames.append((flat, clear))
-    strip = Image.new("RGB", (px * len(frames), px))         # one palette from every frame,
-    for k, (flat, _) in enumerate(frames):                    # or colours missing from frame 0 get lost
-        strip.paste(flat, (k * px, 0))
-    pal = strip.quantize(colors=255)
-    out = []
-    for flat, clear in frames:
-        p = flat.quantize(palette=pal, dither=Image.Dither.NONE)
-        p.paste(255, mask=clear)
-        out.append(p)
-    palette = pal.getpalette()[:255 * 3] + [mr, mg, mb]
-    for p in out:
-        p.putpalette(palette)
-    out[0].save(path, save_all=True, append_images=out[1:], duration=round(1000 / fps), loop=0,
-                transparency=255, disposal=2, optimize=False)
+        rgba = frame(k / n * math.pi, solid, hatch, inside, px)
+        frames.append(Image.alpha_composite(Image.new("RGBA", rgba.size, bg), rgba).convert("RGB"))
+    strip = Image.new("RGB", (px * n, px))                   # one palette from every frame,
+    for k, f in enumerate(frames):                            # or colours missing from frame 0 get lost
+        strip.paste(f, (k * px, 0))
+    pal = strip.quantize(colors=256)
+    out = [f.quantize(palette=pal, dither=Image.Dither.NONE) for f in frames]
+    out[0].save(path, save_all=True, append_images=out[1:], duration=round(1000 / fps), loop=0, optimize=False)
 
 
 if __name__ == "__main__":
     (OUT / "svg").mkdir(parents=True, exist_ok=True)
     (OUT / "gif").mkdir(parents=True, exist_ok=True)
-    for name, (solid, hatch) in COLOURWAYS.items():
+    for name, (solid, hatch, inside, bg) in COLOURWAYS.items():
         for deg in range(0, 180, 15):
-            (OUT / "svg" / f"cube-{name}-{deg:03d}.svg").write_text(svg(math.radians(deg), solid, hatch))
-        matte = INK if name == "white" else WHITE
-        gif(OUT / "gif" / f"cube-{name}-turn.gif", solid, hatch, matte)
+            (OUT / "svg" / f"cube-{name}-{deg:03d}.svg").write_text(svg(math.radians(deg), solid, hatch, inside))
+        gif(OUT / "gif" / f"cube-{name}-turn.gif", solid, hatch, inside, bg)
     print("svg:", len(list((OUT / "svg").glob("*.svg"))), "gif:", sorted(p.name for p in (OUT / "gif").glob("*.gif")))
