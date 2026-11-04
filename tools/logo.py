@@ -110,7 +110,33 @@ def gif(path, solid, hatch, inside, bg, seconds=3.0, fps=20, px=512):
     out[0].save(path, save_all=True, append_images=out[1:], duration=round(1000 / fps), loop=0, optimize=False)
 
 
+def favicon(yaw=math.radians(45), mw=100):
+    """The browser-tab icon: black cube on light browser themes, white on dark ones.
+    Small-size settings (4 x 4 strokes, about 1 px wide at 16 px), framed tight on the cube."""
+    n = lambda p: f"{p[0]:.1f},{p[1]:.1f}"
+    back, front = faces(yaw, mw)
+    xs = [p[0] for f in back + front for p in (f["B0"], f["B1"], f["T1"], f["T0"])]
+    ys = [p[1] for f in back + front for p in (f["B0"], f["B1"], f["T1"], f["T0"])]
+    side = max(max(xs) - min(xs), max(ys) - min(ys)) + 4
+    x0 = (min(xs) + max(xs) - side) / 2
+    y0 = (min(ys) + max(ys) - side) / 2
+    sw = side / 24                                          # thin enough to stay strokes at 16 px
+    quad = lambda f: f'M{n(f["B0"])}L{n(f["B1"])}L{n(f["T1"])}L{n(f["T0"])}Z'
+    parts = [f'<path class="i" d="{"".join(quad(f) for f in back)}"/>']
+    for f in front:
+        if f["solid"]:
+            parts.append(f'<path class="s" d="{quad(f)}"/>')
+        else:
+            d = "".join(f"M{n(a)}L{n(b)}" for a, b in hatches(f, G=4, d=.1))
+            parts.append(f'<path class="h" d="{d}" stroke-width="{sw:.2f}"/>')
+    style = (f".s{{fill:{INK}}}.h{{fill:none;stroke:{INK}}}.i{{fill:{SHADE};fill-opacity:.12}}"
+             f"@media (prefers-color-scheme:dark){{.s{{fill:{WHITE}}}.h{{stroke:{WHITE}}}.i{{fill-opacity:.45}}}}")
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x0:.1f} {y0:.1f} {side:.1f} {side:.1f}">'
+            f"<style>{style}</style>" + "".join(parts) + "</svg>\n")
+
+
 if __name__ == "__main__":
+    (ROOT / "favicon.svg").write_text(favicon())
     (OUT / "svg").mkdir(parents=True, exist_ok=True)
     (OUT / "gif").mkdir(parents=True, exist_ok=True)
     for name, (solid, hatch, inside, bg) in COLOURWAYS.items():
