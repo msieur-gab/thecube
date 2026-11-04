@@ -1,0 +1,41 @@
+name: Deploy to OVH
+
+# Every push to main copies the built site to the server over SSH.
+# Off until the repository variable DEPLOY_ENABLED is set to "true".
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency: deploy
+
+jobs:
+  deploy:
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the built page is current
+        run: |
+          cp site/index.html /tmp/committed.html
+          python3 build.py
+          cmp -s site/index.html /tmp/committed.html || { echo "site/index.html is out of date: run python3 build.py and commit"; exit 1; }
+
+      - name: Set up SSH
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Upload
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+          DEST: ${{ secrets.DEPLOY_PATH }}
+          PORT: ${{ vars.DEPLOY_PORT || '22' }}
+        run: rsync -rvz --checksum -e "ssh -i ~/.ssh/deploy_key -p $PORT" site/ "$USER@$HOST:$DEST/"

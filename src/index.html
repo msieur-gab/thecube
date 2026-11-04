@@ -1,0 +1,678 @@
+<title>the cube</title>
+<meta name="description" content="the cube is the practice of Gabriel Baude, Principal Product Designer (fractional), Munich. Unfolding perspectives.">
+<style>
+@font-face{font-family:"Schibsted Grotesk";font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,%%SG400%%) format("woff2")}
+@font-face{font-family:"Schibsted Grotesk";font-style:normal;font-weight:500;font-display:swap;src:url(data:font/woff2;base64,%%SG500%%) format("woff2")}
+@font-face{font-family:"Schibsted Grotesk";font-style:normal;font-weight:600;font-display:swap;src:url(data:font/woff2;base64,%%SG600%%) format("woff2")}
+@font-face{font-family:"DM Mono";font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,%%DM400%%) format("woff2")}
+@font-face{font-family:"DM Mono";font-style:normal;font-weight:500;font-display:swap;src:url(data:font/woff2;base64,%%DM500%%) format("woff2")}
+@font-face{font-family:"Newsreader";font-style:italic;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,%%NR400I%%) format("woff2")}
+
+/* Layout: the hero is a field of squares; clicking one unfolds a patch and lands on a perspective card.
+   Below, question-left / answer-right rows. Single light look by choice: grey paper, one lime accent. */
+:root{
+  --paper:#DEDEDC;
+  --surface:#ECECEA;
+  --ink:#141414;
+  --ink-2:#55575A;
+  --line:#C4C4C1;
+  --dot:#B4B4B1;
+  --accent:#E4FE00;
+  --accent-soft:color-mix(in srgb,var(--accent) 60%,#FFFFFF);
+  --mine:#DEDEDC;
+  --closed:#DEDEDC;
+  --flash:#B8B8B5; /* a tile starts its reveal here, so the wave reads */
+  --hover:#E6E6E4;
+  --pip:#A8A8A5;
+  --mono:"DM Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --display:"Schibsted Grotesk","Helvetica Neue",Arial,sans-serif;
+  --voice:"Newsreader",Georgia,"Times New Roman",serif;
+  --gutter-l:max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r:max(16px, env(safe-area-inset-right, 0px));
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--display);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:2px}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ---------- sheet ---------- */
+.sheet{background:var(--paper);overflow:hidden;transition:background-color .9s ease}
+.sheet.unfolded{background:var(--surface)}
+
+/* ---------- hero ---------- */
+.hero{position:relative;isolation:isolate;min-height:100svh;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto;padding-left:var(--gutter-l);padding-right:var(--gutter-r);padding-block:clamp(20px,3vw,32px) 24px}
+/* field of squares (mechanic from "The signal is human") */
+.field{position:absolute;inset:0;z-index:0;display:grid;grid-auto-rows:var(--size);align-content:end;overflow:hidden;user-select:none;-webkit-user-select:none}
+.cell{position:relative;overflow:hidden;width:var(--size);height:var(--size);margin:0;padding:0;border:0;background:var(--closed);color:var(--ink-2);font-family:var(--mono);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.cell:hover:not(.open):not(.mine){background:var(--hover)}
+.cell:not(.open):not(.mine)::before{content:"";position:absolute;left:50%;top:50%;width:2px;height:2px;margin:-1px 0 0 -1px;background:var(--pip)}
+.cell:focus-visible{outline:2px solid var(--ink);outline-offset:-2px;z-index:1}
+.cell.void{visibility:hidden;pointer-events:none}
+.cell.open{background:var(--surface);cursor:default}
+.cell .reveal{position:absolute;inset:0;background:var(--flash);animation:reveal .3s ease-out forwards}
+.cell .num{position:relative;z-index:1;opacity:0;animation:fadeIn .4s .1s ease-out forwards}
+@keyframes reveal{from{background:var(--flash)}to{background:var(--surface)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.cell.mine{background:var(--mine);cursor:pointer}
+.cell.mine::after{content:"";width:4px;height:4px;background:var(--accent)}
+.pips{display:flex;flex-wrap:wrap;justify-content:center;gap:3px;width:calc(var(--c) * 4px + (var(--c) - 1) * 3px)}
+.pips i{width:4px;height:4px;background:var(--closed)}
+.clickme{position:absolute;z-index:4;left:0;top:0;padding:4px 8px;background:var(--ink);color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s}
+.clickme.on{opacity:1}
+
+/* perspective card, with a folded corner */
+.card{position:absolute;z-index:5;width:min(320px,calc(100% - 24px));filter:drop-shadow(0 12px 22px rgba(20,20,20,.24))}
+.card-in{position:relative;background:var(--accent-soft);padding:22px 22px 18px;clip-path:polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,0 100%)}
+.card-in::after{content:"";position:absolute;top:0;right:0;width:24px;height:24px;background:linear-gradient(to bottom left,transparent 50%,color-mix(in srgb,var(--accent-soft) 80%,var(--ink)) 50%)}
+.card h2{margin:0 0 8px;padding-right:18px;font-size:1.25rem;font-weight:600;line-height:1.15;letter-spacing:-.02em;text-wrap:balance}
+.card p{margin:0;font-size:15px;line-height:1.45}
+.card-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-variant-numeric:tabular-nums}
+.card button{appearance:none;border:0;background:var(--ink);color:var(--accent);font:inherit;padding:6px 10px;cursor:pointer}
+.card button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.card.pop{animation:grow .2s ease-out forwards}
+@keyframes grow{0%{transform:scale(0);opacity:0}70%{transform:scale(1.1);opacity:.9}100%{transform:scale(1);opacity:1}}
+
+/* text sits above the field; only the text itself catches the pointer */
+.top,.hero-body,.spacer{position:relative;z-index:2;pointer-events:none}
+[data-clear],.float{pointer-events:auto}
+.inner{width:100%;max-width:1320px;margin-inline:auto}
+.hero .inner{max-width:none}
+
+.dot{position:relative;width:8px;height:8px;background:var(--ink);flex:none}
+.dot::after{content:"";position:absolute;inset:-3px;border:1px solid var(--ink);animation:ping 2.4s cubic-bezier(.2,.6,.3,1) infinite}
+@keyframes ping{0%{transform:scale(.5);opacity:1}80%,100%{transform:scale(1.7);opacity:0}}
+
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.title{display:flex;align-items:flex-start;gap:clamp(12px,1.6vw,22px);width:fit-content;max-width:100%}
+.mark-box{flex:none;display:block}
+.mark-box canvas{display:block;width:100%;height:100%}
+.lockup{display:flex;align-items:center;gap:.28em;margin:0;font-size:clamp(2.6rem,5.4vw,4.6rem);font-weight:600;line-height:.95;letter-spacing:-.045em;white-space:nowrap}
+.baseline{margin:.45em 0 0;font-family:var(--voice);font-style:italic;font-size:clamp(1.35rem,2.3vw,1.8rem);line-height:1.15;letter-spacing:-.01em}
+
+.hero-body{align-self:end;display:flex;justify-content:flex-end;min-width:0}
+.side{display:flex;flex-direction:column;align-items:flex-end;gap:12px;width:min(340px,100%)}
+.actions{display:flex;justify-content:flex-end;gap:10px}
+/* offer card: slides advance on their own and can be swiped */
+.offer{width:100%;min-width:0;background:var(--accent);color:var(--ink);border-radius:14px;padding:18px 20px 16px;box-shadow:0 10px 28px rgba(20,20,20,.18);pointer-events:auto}
+.offer.covered{visibility:hidden}
+.offer-head{display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+.offer-dots{display:flex}
+.offer-dots button{position:relative;width:14px;height:14px;padding:0;border:0;background:transparent;cursor:pointer}
+.offer-dots button::before{content:"";position:absolute;inset:3px;border:1px solid var(--ink);border-radius:2px}
+.offer-dots button[aria-current="true"]::before{background:var(--ink)}
+.offer-track{display:flex;width:100%;min-width:0;margin-top:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;border-radius:2px}
+.offer-track::-webkit-scrollbar{display:none}
+.offer-track:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+.slide{flex:0 0 100%;scroll-snap-align:start;margin:0;min-height:calc(3 * 1.2em);font-size:1.3rem;font-weight:500;line-height:1.2;letter-spacing:-.02em;text-wrap:balance}
+.offer-by{margin:14px 0 0;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--ink) 25%,transparent);font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase}
+.float{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:9px 14px;border-radius:999px;text-decoration:none;box-shadow:0 8px 20px rgba(20,20,20,.2)}
+.float.next{background:var(--paper);color:var(--ink)}
+.next svg{transition:transform .25s}
+.next:hover svg{transform:translateY(3px)}
+
+/* ---------- now ---------- */
+.now{padding-left:var(--gutter-l);padding-right:var(--gutter-r);padding-block:clamp(56px,9vw,128px) clamp(48px,7vw,96px)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:20px clamp(24px,5vw,72px);padding-block:clamp(32px,5vw,56px);border-top:1px solid var(--line)}
+.row:first-child{border-top:1px solid var(--ink)}
+.q{margin:0;font-family:var(--voice);font-style:italic;font-size:clamp(1.3rem,2.2vw,1.6rem);line-height:1.2;color:var(--ink-2)}
+.a{min-width:0;max-width:44rem}
+.statement{margin:0;font-size:clamp(1.75rem,3.8vw,2.8rem);font-weight:500;line-height:1.08;letter-spacing:-.03em;text-wrap:balance}
+.a p{margin:16px 0 0;font-size:1.0625rem;color:var(--ink-2);max-width:36rem}
+.a p.lede{color:var(--ink);font-size:1.1875rem}
+.status{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:24px;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
+.status .sep{width:1px;height:14px;background:var(--line)}
+.status .muted{color:var(--ink-2);font-weight:400}
+
+.talk{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:clamp(20px,3vw,32px)}
+.talk-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.label{font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;background:var(--accent);border-radius:999px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.talk h3{margin:18px 0 0;font-size:clamp(1.6rem,3vw,2.2rem);font-weight:600;line-height:1.05;letter-spacing:-.03em}
+.talk .meta{margin:12px 0 0;display:flex;flex-direction:column;gap:2px;font-size:15px;color:var(--ink)}
+.talk .meta .venue{color:var(--ink-2)}
+.talk .thesis{margin:18px 0 0;padding-top:18px;border-top:1px solid var(--line);font-family:var(--voice);font-style:italic;font-size:1.2rem;line-height:1.35;color:var(--ink)}
+
+.mail{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;margin-top:22px}
+.mail a{font-size:clamp(1.4rem,3vw,2.1rem);font-weight:500;letter-spacing:-.025em;text-decoration-line:underline;text-decoration-color:var(--accent);text-decoration-thickness:.14em;text-underline-offset:.16em;word-break:break-word;min-width:0}
+.mail a:hover{text-decoration-color:var(--ink)}
+.btn{appearance:none;font:inherit;font-size:13px;font-weight:500;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);cursor:pointer;transition:border-color .2s}
+.btn:hover{border-color:var(--ink)}
+.restart{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.restart:hover{background:var(--ink-2);border-color:var(--ink-2)}
+.restart.float{font-family:var(--mono);font-size:12px;font-weight:500;padding:10px 18px;background:var(--accent);color:var(--ink);border:0}
+.restart.float:hover{background:color-mix(in srgb,var(--accent) 88%,var(--ink))}
+.float.cta{background:var(--ink);color:var(--accent)}
+.float.cta:hover{background:var(--ink-2)}
+.also{margin-top:18px!important;font-size:15px!important}
+.also a{color:var(--ink);text-underline-offset:.2em}
+
+footer{padding-left:var(--gutter-l);padding-right:var(--gutter-r);padding-block:24px 40px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}
+.foot-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px}
+.legal summary{cursor:pointer;color:var(--ink);list-style:none}
+.legal summary::-webkit-details-marker{display:none}
+.legal summary::after{content:" +"}
+.legal[open] summary::after{content:" −"}
+.legal-body{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px 40px;margin-top:18px;max-width:52rem}
+.legal-body p{margin:0}
+.legal-body strong{color:var(--ink);font-weight:500}
+
+/* ---------- narrow ---------- */
+@media (max-width:819px){
+    .row{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:599px){
+  .card{transform-origin:50% 100%!important}
+  .card.pop{animation-name:rise}
+  @keyframes rise{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+  .hero{min-height:max(660px,100svh)}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .cell .reveal,.cell .num,.card.pop{animation:none}
+  .cell .reveal{display:none}
+  .cell .num{opacity:1}
+  .dot::after{animation:none;opacity:0}
+}
+</style>
+<!-- body -->
+<div class="sheet">
+<header class="hero" id="top">
+  <div class="field" id="field" role="group" aria-label="Field of squares. Use the arrow keys to move and Enter to open a square."></div>
+  <div class="clickme" id="clickme" aria-hidden="true">Click me</div>
+  <div class="card" id="card" role="dialog" aria-labelledby="card-title" hidden>
+    <div class="card-in">
+      <h2 id="card-title"></h2>
+      <p id="card-text"></p>
+      <div class="card-foot"><span id="card-n"></span><button type="button" id="card-close">Close</button></div>
+    </div>
+  </div>
+
+  <div class="inner top">
+    <div class="title" data-clear>
+      <span class="mark-box" id="mark-box"><canvas id="mark" aria-hidden="true"></canvas></span>
+      <div id="title-text">
+        <h1 class="lockup"><span>the cube</span></h1>
+        <p class="baseline">Unfolding perspectives</p>
+      </div>
+    </div>
+    <button class="btn restart float" id="restart" type="button" hidden>Restart</button>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="inner hero-body">
+    <div class="side">
+      <section class="offer" id="offer" aria-roledescription="carousel" aria-label="What I offer">
+        <div class="offer-head">
+          <span>I help teams…</span>
+          <div class="offer-dots" role="group" aria-label="Choose a slide">
+            <button type="button" aria-label="Slide 1"></button><button type="button" aria-label="Slide 2"></button><button type="button" aria-label="Slide 3"></button><button type="button" aria-label="Slide 4"></button><button type="button" aria-label="Slide 5"></button><button type="button" aria-label="Slide 6"></button>
+          </div>
+        </div>
+        <div class="offer-track" id="offer-track" tabindex="0">
+          <p class="slide" role="group" aria-roledescription="slide" aria-label="1 of 6">find the problem hiding behind the brief.</p>
+          <p class="slide" role="group" aria-roledescription="slide" aria-label="2 of 6">turn symptoms into something they can see and test.</p>
+          <p class="slide" role="group" aria-roledescription="slide" aria-label="3 of 6">read European regulation as a design brief.</p>
+          <p class="slide" role="group" aria-roledescription="slide" aria-label="4 of 6">decide what is worth building, before building it.</p>
+          <p class="slide" role="group" aria-roledescription="slide" aria-label="5 of 6">use AI where it helps, and leave it out where it doesn't.</p>
+          <p class="slide" role="group" aria-roledescription="slide" aria-label="6 of 6">end up with answers their own people can run.</p>
+        </div>
+        <p class="offer-by">Gabriel Baude · Principal Product Designer · Fractional</p>
+      </section>
+      <div class="actions">
+      <a class="float next" href="#now">Now
+        <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M6 1v11M1.5 7.5 6 12l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="float cta" href="#contact">Discuss your brief
+        <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M6 1v11M1.5 7.5 6 12l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="now" id="now">
+  <div class="inner">
+    <section class="row" aria-labelledby="where">
+      <p class="q">Where are you?</p>
+      <div class="a">
+        <h2 class="statement" id="where">Heads-down on projects, with clients and on my own.</h2>
+        <p class="lede">The rest of the cube is still folded.</p>
+        <p>The work, the writing and the method open in the coming weeks. Come back then, or write to me now if it can't wait.</p>
+        <div class="status">
+          <span class="dot" aria-hidden="true"></span><span>Busy building</span>
+          <span class="sep" aria-hidden="true"></span>
+          <span class="muted">Munich, <span data-clock>--:--</span></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="row" id="lecture" aria-labelledby="talk">
+      <p class="q">Where can I hear you?</p>
+      <div class="a">
+        <article class="talk">
+          <div class="talk-top">
+            <span class="label">Lecture</span>
+            <span class="chip" id="countdown">11 Nov</span>
+          </div>
+          <h3 id="talk">Designing by Abstention</h3>
+          <p class="meta"><span>Wednesday, 11 November 2026 · In English</span><span class="venue">Hochschule Pforzheim, School of Design</span></p>
+          <p class="thesis">How to design a more desirable human future with the very technology that endangers it.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="row" id="contact" aria-labelledby="talk-to-me">
+      <p class="q">Can we talk anyway?</p>
+      <div class="a">
+        <h2 class="statement" id="talk-to-me">Yes. Bring the brief.</h2>
+        <p>Especially if it describes symptoms and you can't name the problem yet.</p>
+        <div class="mail">
+          <a id="mail-link" href="mailto:hello@thecu.be"><span data-email>hello@thecu.be</span></a>
+          <button class="btn" id="copy" type="button">Copy address</button>
+        </div>
+        <p class="also">Or follow along on <a id="li-link" href="https://www.linkedin.com/in/gabrielbaude/" target="_blank" rel="noopener">LinkedIn</a>.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="inner">
+    <div class="foot-row">
+      <span>thecu.be · © 2026 Gabriel Baude</span>
+      <span>No cookies. No trackers. No third-party requests.</span>
+    </div>
+    <details class="legal">
+      <summary>Impressum &amp; privacy</summary>
+      <div class="legal-body">
+        <p><strong>Angaben gemäß § 5 DDG</strong><br>Gabriel Baude<br>[Street and number]<br>[Postcode] München, Germany<br>E-Mail: <span data-email>hello@thecu.be</span><br>USt-IdNr.: [DE…]</p>
+        <p><strong>Privacy</strong><br>This page sets no cookies, loads nothing from third parties and runs no analytics. Its fonts are embedded in the page. To deliver it, the hosting provider processes your IP address in standard server logs.</p>
+      </div>
+    </details>
+  </div>
+</footer>
+</div>
+
+<script>
+(() => {
+  /* ---- edit these two lines ---- */
+  const CONTACT_EMAIL = "hello@thecu.be";
+  const LINKEDIN_URL = "https://www.linkedin.com/in/gabrielbaude/";
+  const TALK_DATE = [2026, 11, 11]; // year, month, day (Berlin time)
+
+  const TZ = "Europe/Berlin";
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* contact */
+  document.querySelectorAll("[data-email]").forEach(e => e.textContent = CONTACT_EMAIL);
+  document.getElementById("mail-link").href = "mailto:" + CONTACT_EMAIL;
+  document.getElementById("li-link").href = LINKEDIN_URL;
+  const copyBtn = document.getElementById("copy");
+  copyBtn.addEventListener("click", () => {
+    const done = () => { copyBtn.textContent = "Copied"; setTimeout(() => copyBtn.textContent = "Copy address", 2000); };
+    const fallback = () => {
+      const el = document.querySelector("#mail-link [data-email]");
+      const r = document.createRange(); r.selectNodeContents(el);
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      copyBtn.textContent = "Selected, press copy";
+      setTimeout(() => copyBtn.textContent = "Copy address", 2600);
+    };
+    try { navigator.clipboard.writeText(CONTACT_EMAIL).then(done, fallback); } catch (e) { fallback(); }
+  });
+
+  /* Munich clock */
+  const fmtTime = new Intl.DateTimeFormat("en-GB", { timeZone: TZ, hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+  const tick = () => { const t = fmtTime.format(new Date()); document.querySelectorAll("[data-clock]").forEach(e => e.textContent = t); };
+  tick(); setInterval(tick, 15000);
+
+  /* lecture countdown, in Berlin calendar days */
+  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: TZ, year: "numeric", month: "numeric", day: "numeric" }).formatToParts(new Date());
+  const get = k => +parts.find(p => p.type === k).value;
+  const days = Math.round((Date.UTC(TALK_DATE[0], TALK_DATE[1] - 1, TALK_DATE[2]) - Date.UTC(get("year"), get("month") - 1, get("day"))) / 864e5);
+  const chip = document.getElementById("countdown");
+  chip.textContent = days > 1 ? "In " + days + " days" : days === 1 ? "Tomorrow" : days === 0 ? "Today" : "Given";
+
+  /* ---- offer card: slides advance on their own, can be swiped or picked ---- */
+  (() => {
+    const offer = document.getElementById("offer"), track = document.getElementById("offer-track");
+    const dots = [...offer.querySelectorAll(".offer-dots button")], n = dots.length;
+    let i = 0, holdUntil = 0, hover = false;
+    const mark = () => dots.forEach((d, j) => d.setAttribute("aria-current", j === i ? "true" : "false"));
+    const go = k => { i = (k + n) % n; track.scrollTo({ left: i * track.clientWidth, behavior: reduce ? "auto" : "smooth" }); mark(); };
+    track.addEventListener("scroll", () => { const k = Math.round(track.scrollLeft / track.clientWidth); if (k !== i) { i = k; mark(); } }, { passive: true });
+    dots.forEach((d, j) => d.addEventListener("click", () => { holdUntil = performance.now() + 9000; go(j); }));
+    ["pointerdown", "wheel", "touchstart", "keydown"].forEach(ev => track.addEventListener(ev, () => { holdUntil = performance.now() + 9000; }, { passive: true }));
+    offer.addEventListener("pointerenter", () => { hover = true; });
+    offer.addEventListener("pointerleave", () => { hover = false; });
+    offer.addEventListener("focusin", () => { holdUntil = performance.now() + 9000; });
+    window.addEventListener("resize", () => { track.scrollTo({ left: i * track.clientWidth }); });
+    mark();
+    if (!reduce) setInterval(() => { if (hover || document.hidden || performance.now() < holdUntil) return; go(i + 1); }, 4500);
+  })();
+
+  /* ---- logo: one cube, one solid face, one hatched face ---- */
+  (() => {
+    const mk = document.getElementById("mark"), mc = mk.getContext("2d");
+    const css = getComputedStyle(document.documentElement);
+    const ink = css.getPropertyValue("--ink").trim() || "#141414";
+    const acc = css.getPropertyValue("--accent").trim() || "#E4FE00";
+    const D = 2.6;
+    let mw = 0, yaw = 0;
+    const box = document.getElementById("mark-box"), text = document.getElementById("title-text");
+    const size = () => {
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const h = Math.round(text.querySelector(".lockup").getBoundingClientRect().height);
+      box.style.width = box.style.height = h + "px";
+      mw = h;
+      mk.width = mk.height = Math.round(mw * dpr);
+      mc.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    const lp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+    const draw = () => {
+      mc.clearRect(0, 0, mw, mw);
+      const cx = mw / 2, cy = mw / 2, S = mw * .5, lw = Math.max(1, mw / 34);
+      const pt = (a, y) => {
+        const x = Math.SQRT1_2 * Math.sin(a), z = Math.SQRT1_2 * Math.cos(a), f = D / (D - z);
+        return [cx + x * f * S, cy - y * f * S];
+      };
+      const fs = [];
+      for (let fi = 0; fi < 4; fi++) {
+        const th = yaw + fi * Math.PI / 2, nx = Math.sin(th), nz = Math.cos(th);
+        if (nx * -.5 * nx + nz * (D - .5 * nz) <= 0) continue;
+        fs.push({ solid: fi % 2 === 0, z: nz, B0: pt(th - Math.PI / 4, -.5), B1: pt(th + Math.PI / 4, -.5), T1: pt(th + Math.PI / 4, .5), T0: pt(th - Math.PI / 4, .5) });
+      }
+      fs.sort((a, b) => a.z - b.z);
+      mc.lineCap = "round"; mc.lineJoin = "round"; mc.strokeStyle = ink;
+      for (const f of fs) {
+        if (f.solid) {
+          mc.beginPath(); mc.moveTo(...f.B0); mc.lineTo(...f.B1); mc.lineTo(...f.T1); mc.lineTo(...f.T0); mc.closePath();
+          mc.fillStyle = acc; mc.fill();
+        } else {
+          mc.lineWidth = Math.max(1, mw / 70); mc.lineCap = "butt"; mc.beginPath();
+          const G = mw > 64 ? 6 : 4, d = mw > 64 ? .055 : .085;
+          for (let i = 0; i < G; i++) for (let j = 0; j < G; j++) {
+            const u = (i + .5) / G, v = (j + .5) / G;
+            const at = (uu, vv) => lp(lp(f.B0, f.B1, uu), lp(f.T0, f.T1, uu), vv);
+            mc.moveTo(...at(u - d, v - d)); mc.lineTo(...at(u + d, v + d));
+          }
+          mc.stroke();
+        }
+      }
+    };
+    /* a different angle on each visit: one of the steps of a quarter turn (never fully front-on) */
+    yaw = (1 + Math.floor(Math.random() * 15)) / 16 * Math.PI / 2;
+    size(); draw();
+    window.addEventListener("resize", () => { size(); draw(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { size(); draw(); });
+  })();
+
+  /* ---- the field: click a square, unfold a patch, land on a perspective ---- */
+  const PERSPECTIVES = [
+    { t: "A brief is rarely a problem", d: "Most briefs describe symptoms. The problem usually sits one layer down, between how the system is built and how people meet it. That is where I start digging." },
+    { t: "Regulation is a brief", d: "European rules put into law what people already ask for: transparency, agency, trust. Read them as a brief and they stop being a wall." },
+    { t: "Architecture is policy", d: "Where data sits, on which server, in which jurisdiction, on whose roadmap, decides what it can be used for. Sovereignty is spatial before it is legal." },
+    { t: "Silence is a signal", d: "What people don't click, don't save, don't share is often more honest than what they do. It is rarely measured, because it is harder to count." },
+    { t: "Agency before optimisation", d: "Optimising for engagement is easy. Designing for the life someone actually wants is harder, because it requires asking. Most systems skip the asking." },
+    { t: "Build to find the question", d: "The real problem framing starts once a first prototype exists. Building shows you what the brief left out." },
+    { t: "Abstention is not refusal", d: "Choosing not to track, collect or identify isn't a no. It's a \"yes, but\" that clears room for answers nobody had considered." },
+    { t: "The outlier is the point", d: "Systems reward the common case. Human value often sits at the edge: the rare question, the unusual user. Tune only for the middle and you design against people." },
+    { t: "Not every friction is a problem", d: "A tree shedding its leaves isn't a problem. Part of design is telling the friction worth relieving from the cycle worth accepting." },
+    { t: "Trust doesn't scale", d: "Trust is earned one interaction at a time. A system that tests well on average can still feel hostile in the particular, and the particular is where people live." },
+    { t: "Use AI, then put it down", d: "Models are instruments. Knowing when to steer them, and when to leave them out, is the part that stays human." },
+    { t: "Your team already knows", d: "The best answer is one your own people can carry on without me. Often you don't need an AI expert. You need to see what you already have." }
+  ];
+  const hero = document.querySelector(".hero");
+  const field = document.getElementById("field");
+  const card = document.getElementById("card");
+  const cardT = document.getElementById("card-title"), cardD = document.getElementById("card-text"), cardN = document.getElementById("card-n");
+  const closeBtn = document.getElementById("card-close");
+  const restartBtn = document.getElementById("restart");
+  const sheet = document.querySelector(".sheet");
+  const pad2 = n => String(n).padStart(2, "0");
+  const MINE = 16, OPEN = 32;
+  const MINE_DENSITY = .12; /* about one square in eight */
+  const LOSE_AFTER = 2;      /* used only by the rigged loss, which is commented out below */
+  let cols = 0, rows = 0, size = 0, val = [], voids = [], els = [], msgOf = {}, focusIdx = -1, lastIdx = -1, builtW = 0;
+  let over = false, gen = 0, clicks = 0;
+
+  /* n nearby flags shown as n small squares, in rows of up to three */
+  const pips = n => n > 0 ? '<span class="num pips" style="--c:' + (n <= 3 ? n : n === 4 ? 2 : 3) + '" aria-hidden="true">' + "<i></i>".repeat(n) + "</span>" : '<span class="num"></span>';
+
+  const neighbors = idx => {
+    const x = idx % cols, y = Math.floor(idx / cols), out = [];
+    for (let i = -1; i < 2; i++) for (let j = -1; j < 2; j++) {
+      if ((i || j) && x + j >= 0 && y + i >= 0 && x + j < cols && y + i < rows) out.push(x + j + (y + i) * cols);
+    }
+    return out;
+  };
+
+  const build = () => {
+    const W = hero.clientWidth, H = hero.clientHeight;
+    cols = Math.max(5, Math.floor(W / (W < 600 ? 48 : 58)));
+    size = W / cols; rows = Math.ceil(H / size);
+    field.style.setProperty("--size", size + "px");
+    field.style.gridTemplateColumns = "repeat(" + cols + ", " + size + "px)";
+    const hr = hero.getBoundingClientRect();
+    const zones = [...hero.querySelectorAll("[data-clear]")].map(el => {
+      const r = el.getBoundingClientRect();
+      return [r.left - hr.left - 6, r.top - hr.top - 6, r.right - hr.left + 6, r.bottom - hr.top + 6];
+    });
+    field.innerHTML = ""; els = []; voids = []; val = new Array(cols * rows).fill(0); msgOf = {}; over = false; gen++; clicks = 0;
+    const frag = document.createDocumentFragment();
+    const offset = H - rows * size; /* zero or negative: the top row overflows */
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      const x0 = c * size, y0 = offset + r * size;
+      const blocked = zones.some(z => x0 < z[2] && x0 + size > z[0] && y0 < z[3] && y0 + size > z[1]);
+      const el = document.createElement(blocked ? "div" : "button");
+      el.className = "cell" + (blocked ? " void" : "");
+      if (!blocked) { el.type = "button"; el.tabIndex = -1; el.setAttribute("aria-label", "Closed square"); }
+      el.dataset.i = els.length;
+      els.push(el); voids.push(blocked);
+      frag.appendChild(el);
+    }
+    field.appendChild(frag);
+    /* lay the perspectives like mines, then count neighbours */
+    const pool = [];
+    const safeRows = offset < -0.5 ? 1 : 0; /* the cut top row never holds a flag, as in the original */
+    for (let i = safeRows * cols; i < val.length; i++) if (!voids[i]) pool.push(i);
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    const count = Math.max(PERSPECTIVES.length, Math.round(pool.length * MINE_DENSITY));
+    for (let i = 0; i < count; i++) { val[pool[i]] = MINE; msgOf[pool[i]] = i % PERSPECTIVES.length; }
+    for (let i = 0; i < val.length; i++) if (val[i] !== MINE) val[i] = neighbors(i).reduce((n, k) => n + ((val[k] & MINE) ? 1 : 0), 0);
+    focusIdx = voids.indexOf(false);
+    if (focusIdx >= 0) els[focusIdx].tabIndex = 0;
+  };
+
+  const open = idx => {
+    const v = val[idx];
+    if (voids[idx] || (v & MINE) || (v & OPEN)) return;
+    const n = v & 0x0F;
+    val[idx] |= OPEN;
+    const el = els[idx];
+    el.classList.add("open");
+    el.innerHTML = '<span class="reveal" aria-hidden="true"></span>' + pips(n);
+    el.setAttribute("aria-label", n > 0 ? n + " perspectives nearby" : "Open square");
+    const g = gen;
+    if (n === 0) neighbors(idx).forEach((k, i) => setTimeout(() => { if (!over && g === gen) open(k); }, (i + 1) * 30));
+  };
+
+  const offerCard = document.getElementById("offer");
+  const placeCard = idx => {
+    const hr = hero.getBoundingClientRect();
+    if (hero.clientWidth < 600) {
+      /* phones: cover the offer card exactly, bottom edges aligned, buttons left visible */
+      const o = offerCard.getBoundingClientRect();
+      card.style.width = o.width + "px";
+      card.style.left = (o.left - hr.left) + "px";
+      card.style.top = (o.bottom - hr.top - card.offsetHeight) + "px";
+      offerCard.classList.add("covered");
+      return;
+    }
+    card.style.width = "";
+    offerCard.classList.remove("covered");
+    const r = els[idx].getBoundingClientRect();
+    const W = hero.clientWidth, H = hero.clientHeight, cw = card.offsetWidth, ch = card.offsetHeight;
+    let left = r.left - hr.left + r.width / 2 - cw / 2, top = r.bottom - hr.top + 24;
+    if (top + ch > H - 10) top = r.top - hr.top - ch - 8;
+    left = Math.max(10, Math.min(left, W - cw - 10));
+    top = Math.max(10, Math.min(top, H - ch - 10));
+    card.style.left = left + "px"; card.style.top = top + "px";
+    card.style.transformOrigin = (r.left - hr.left + r.width / 2 - left) + "px " + (top < r.top - hr.top ? "100%" : "0");
+  };
+  const showCard = (idx, viaKeys) => {
+    const m = msgOf[idx], P = PERSPECTIVES[m];
+    cardT.textContent = P.t; cardD.textContent = P.d;
+    cardN.textContent = pad2(m + 1) + " / " + pad2(PERSPECTIVES.length);
+    card.hidden = false; placeCard(idx);
+    card.classList.remove("pop"); void card.offsetWidth; card.classList.add("pop");
+    lastIdx = idx;
+    if (viaKeys) closeBtn.focus();
+  };
+  const hideCard = refocus => { card.hidden = true; offerCard.classList.remove("covered"); if (refocus && lastIdx >= 0) els[lastIdx].focus(); };
+
+  field.addEventListener("click", e => {
+    const el = e.target.closest(".cell");
+    if (!el || el.classList.contains("void")) return;
+    const idx = +el.dataset.i;
+    setFocus(idx, false);
+    let isMine = (val[idx] & MINE) === MINE;
+    if (over) { if (isMine) showCard(idx, e.detail === 0); return; }
+    if (val[idx] & OPEN) return;
+    clicks++;
+    /* rigged loss, switched off for now: uncomment to make click number LOSE_AFTER always find a flag
+    if (!isMine && clicks >= LOSE_AFTER) { rigMine(idx); isMine = true; }
+    */
+    if (isMine) {
+      markMine(idx);
+      showCard(idx, e.detail === 0);
+      gameOver(idx);
+    } else {
+      open(idx);
+    }
+  });
+
+  /* move a hidden flag under the clicked square, without changing any number already shown */
+  const rigMine = idx => {
+    const mines = [];
+    for (let i = 0; i < val.length; i++) if (val[i] & MINE) mines.push(i);
+    const quiet = mines.filter(i => !neighbors(i).some(k => val[k] & OPEN));
+    if (quiet.length) {
+      const from = quiet[Math.floor(Math.random() * quiet.length)];
+      msgOf[idx] = msgOf[from]; delete msgOf[from]; val[from] = 0;
+    } else {
+      msgOf[idx] = mines.length % PERSPECTIVES.length;
+    }
+    val[idx] = MINE;
+    for (let i = 0; i < val.length; i++) {
+      if (val[i] & MINE) continue;
+      const openBit = val[i] & OPEN;
+      val[i] = neighbors(i).reduce((n, k) => n + ((val[k] & MINE) ? 1 : 0), 0) | openBit;
+    }
+    neighbors(idx).forEach(k => {
+      if (!(val[k] & OPEN)) return;
+      const num = els[k].querySelector(".num"), n = val[k] & 0x0F;
+      if (num) num.outerHTML = pips(n);
+      els[k].setAttribute("aria-label", n > 0 ? n + " perspectives nearby" : "Open square");
+    });
+  };
+
+  const markMine = idx => {
+    const el = els[idx];
+    el.classList.add("mine");
+    el.setAttribute("aria-label", "Perspective: " + PERSPECTIVES[msgOf[idx]].t);
+  };
+  /* one flag found: the whole grid unfolds outward from it */
+  const gameOver = idx => {
+    if (over) return;
+    over = true;
+    const g = gen, oc = idx % cols, or = Math.floor(idx / cols);
+    let maxDelay = 0;
+    for (let i = 0; i < val.length; i++) {
+      if (voids[i] || (val[i] & OPEN) || i === idx) continue;
+      const delay = Math.hypot(i % cols - oc, Math.floor(i / cols) - or) * 25;
+      if (delay > maxDelay) maxDelay = delay;
+      setTimeout(() => {
+        if (g !== gen) return;
+        if (val[i] & MINE) { markMine(i); return; }
+        const n = val[i] & 0x0F;
+        val[i] |= OPEN;
+        els[i].classList.add("open");
+        els[i].innerHTML = '<span class="reveal" aria-hidden="true"></span>' + pips(n);
+        els[i].setAttribute("aria-label", n > 0 ? n + " perspectives nearby" : "Open square");
+      }, reduce ? 0 : delay);
+    }
+    /* the page takes the open colour only once the wave has passed */
+    setTimeout(() => { if (g === gen) sheet.classList.add("unfolded"); }, reduce ? 0 : maxDelay + 350);
+    setTimeout(() => { if (g === gen) restartBtn.hidden = false; }, 1500);
+  };
+  restartBtn.addEventListener("click", () => { init(); });
+
+  /* a small "click me" follows the pointer over closed squares, until the first click */
+  const tip = document.getElementById("clickme");
+  let clicked = false;
+  const noHover = window.matchMedia("(hover: none)").matches;
+  const placeTipOnCell = () => {
+    if (clicked || !noHover) return;
+    const W = hero.clientWidth;
+    const tr = Math.round(rows * .55), tc = Math.round(cols * (W >= 820 ? .65 : .5));
+    let best = -1, bd = 1e9;
+    for (let i = 0; i < els.length; i++) { if (voids[i]) continue; const d = Math.hypot(Math.floor(i / cols) - tr, i % cols - tc); if (d < bd) { bd = d; best = i; } }
+    if (best < 0) return;
+    const hr = hero.getBoundingClientRect(), r = els[best].getBoundingClientRect();
+    tip.textContent = "Tap me";
+    tip.style.transform = "translate(" + (r.left - hr.left + r.width * .5) + "px," + (r.top - hr.top + r.height * .5) + "px)";
+    tip.classList.add("on");
+  };
+  field.addEventListener("pointermove", e => {
+    if (clicked || e.pointerType === "touch") return;
+    const el = e.target.closest(".cell");
+    const show = el && !el.classList.contains("void") && !el.classList.contains("open") && !el.classList.contains("mine");
+    tip.classList.toggle("on", !!show);
+    if (!show) return;
+    const hr = hero.getBoundingClientRect();
+    tip.style.transform = "translate(" + (e.clientX - hr.left + 14) + "px," + (e.clientY - hr.top + 16) + "px)";
+  });
+  field.addEventListener("pointerleave", () => tip.classList.remove("on"));
+  field.addEventListener("click", () => { clicked = true; tip.classList.remove("on"); }, true);
+  closeBtn.addEventListener("click", () => hideCard(true));
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !card.hidden) hideCard(true); });
+
+  /* arrow keys move through the squares */
+  const setFocus = (i, move = true) => {
+    if (i < 0 || voids[i] !== false) return;
+    if (focusIdx >= 0 && els[focusIdx]) els[focusIdx].tabIndex = -1;
+    focusIdx = i; els[i].tabIndex = 0;
+    if (move) els[i].focus();
+  };
+  field.addEventListener("keydown", e => {
+    const d = { ArrowRight: [0, 1], ArrowLeft: [0, -1], ArrowDown: [1, 0], ArrowUp: [-1, 0] }[e.key];
+    if (!d || focusIdx < 0) return;
+    e.preventDefault();
+    let r = Math.floor(focusIdx / cols), c = focusIdx % cols;
+    for (let step = 0; step < Math.max(rows, cols); step++) {
+      r += d[0]; c += d[1];
+      if (r < 0 || c < 0 || r >= rows || c >= cols) return;
+      const i = r * cols + c;
+      if (!voids[i]) { setFocus(i); return; }
+    }
+  });
+
+  const init = () => { builtW = hero.clientWidth; card.hidden = true; offerCard.classList.remove("covered"); restartBtn.hidden = true; sheet.classList.remove("unfolded"); build(); if (typeof placeTipOnCell === "function") placeTipOnCell(); };
+  init();
+  placeTipOnCell();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (!val.some(v => v & OPEN) && card.hidden) build(); });
+  let rt = 0;
+  window.addEventListener("resize", () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => {
+      if (Math.abs(hero.clientWidth - builtW) > 40) init();
+      else if (!card.hidden && lastIdx >= 0) placeCard(lastIdx);
+    }, 120);
+  });
+})();
+</script>
