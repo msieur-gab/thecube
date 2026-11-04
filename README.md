@@ -19,9 +19,10 @@ The deploy checks that `site/index.html` matches the source, so a forgotten buil
 
 ## Go back to an earlier version
 
-The first landing (the minefield page alone) is tagged `landing-v1`:
+The first landing (the minefield page alone) is kept on the branch `landing-v1`. Only `main` is deployed, so that branch never goes live by itself. To bring it back:
 
-    git checkout landing-v1 -- src site
+    git fetch origin landing-v1
+    git checkout origin/landing-v1 -- src site
     git commit -m "Restore landing-v1" && git push
 
 ## Deploy setup (once)
