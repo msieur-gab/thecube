@@ -18,15 +18,11 @@ export function initMethodField() {
     field.appendChild(frag);
     align();
   };
-  /* one grid for the whole page: the dotted ground and the method's tiles share columns and rows */
-  const host = document.getElementById("dotted"), dots = document.getElementById("dots-bg");
+  /* one grid for the whole page: the method's tiles sit on the rows of the dotted ground (drawn by dotted-ground.js) */
+  const host = document.getElementById("dotted");
   function align() {
-    const W = field.clientWidth, left0 = (W - cols * size) / 2;
     const off = section.getBoundingClientRect().top - host.getBoundingClientRect().top;
     field.style.top = -(((off % size) + size) % size) + "px";
-    const c = size / 2 - 1;
-    dots.style.backgroundImage = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='" + size + "' height='" + size + "'%3E%3Crect x='" + c + "' y='" + c + "' width='2' height='2' fill='%23A8A8A5'/%3E%3C/svg%3E\")";
-    dots.style.backgroundPosition = left0 + "px 0px";
   }
   if ("ResizeObserver" in window) new ResizeObserver(() => align()).observe(host);
   const close = () => cells.forEach(c => { if (c.classList.contains("open")) { c.classList.remove("open", "mine"); c.style.removeProperty("--d"); } });
